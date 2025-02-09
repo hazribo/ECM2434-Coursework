@@ -1,0 +1,15 @@
+asgiref==3.8.1
+astroid==3.0.1
+colorama==0.4.6
+dill==0.3.7
+Django==5.1.6
+isort==5.12.0
+mccabe==0.7.0
+platformdirs==3.11.0
+pygame==2.1.2
+pylint==3.0.2
+sqlparse==0.5.3
+tomli==2.0.1
+tomlkit==0.12.2
+typing_extensions==4.8.0
+tzdata==2025.1
