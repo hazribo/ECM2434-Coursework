@@ -5,10 +5,25 @@
 
 {% block content %}
     <h2>Login</h2>
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
     <form method="post">
         {% csrf_token %}
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <!-- Username: -->
+        <div class="form-group">
+            <input type="text" name="username" placeholder="Username" required>  
+        </div>
+        <!-- Password: -->
+        <div class="form-group">
+            <input type="password" name="password" placeholder="Password" required>
+        </div>
+        
         <button type="submit">Login</button>
     </form>
     <b>Don't have an account? <a href="{% url 'register' %}">Register here.</a></b>
