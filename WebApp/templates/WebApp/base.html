@@ -14,7 +14,7 @@
                 padding-top: 56px; /* Adjust for fixed navbar */
             }
             .navbar {
-                background-color: #f8f9fa; /* Light gray background */
+                background-color: #11d174;
             }
             .navbar-brand {
                 font-weight: bold;
@@ -44,6 +44,20 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'register' %}">Register</a>
                     </li>                    
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link">Logged in as <strong>{{ user.username }}</strong></span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <span class="nav-link">Not logged in. <a href="{% url 'login' %}">Login?</a></span>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
