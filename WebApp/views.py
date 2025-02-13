@@ -3,6 +3,9 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
 from .forms import UserRegistrationForm
 
+def home(request):
+    return render(request, 'WebApp/home.html')
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
