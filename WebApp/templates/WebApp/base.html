@@ -14,10 +14,14 @@
                 padding-top: 56px; /* Adjust for fixed navbar */
             }
             .navbar {
-                background-color: #11d174;
+                background-color: #003C3C; /* University of Exeter website colour */
             }
-            .navbar-brand {
-                font-weight: bold;
+            .navbar-brand, .nav-link {
+                color: white !important; /* Force white text */
+                font-weight: bold !important; /* Make text bold */
+            }
+                .navbar-brand:hover, .nav-link:hover {
+                color: #f8f9fa !important; /* Slightly lighter white on hover */
             }
             .main-content {
                 padding: 20px;
@@ -37,13 +41,7 @@
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item active">
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
-                    </li>                    
+                    </li>                  
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
