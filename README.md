@@ -49,7 +49,7 @@ python manage.py runserver
 ```
 
 By default, the server will run at `http://127.0.0.1:8000/`.
-Currently, the pages `http://127.0.0.1:8000/login` and `http://127.0.0.1:8000/register` are active with a basic user registration system.
+Currently, the pages `http://127.0.0.1:8000/login`, `http://127.0.0.1:8000/register` and `http://127.0.0.1:8000/leaderboard` are active with a basic user registration and score leaderboard system.
 
 ## 6. Exit Venv
 To exit the virtual environment, run:
