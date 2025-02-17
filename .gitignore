@@ -9,11 +9,13 @@ staticfiles/
 
 # Virtual environment
 venv/
+env/
 .env
 
 # IDE
 .vscode/
 .idea/
+.vs/
 
 # OS
 .DS_Store
