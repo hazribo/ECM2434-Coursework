@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import UserRegistrationForm
+from .leaderboard_src import generate_leaderboard_image
 
 def home(request):
     return render(request, 'WebApp/home.html')
@@ -35,6 +36,23 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+def leaderboard(request):
+    
+    if generate_leaderboard_image() is not None:
+        # if fine and no error
+        return render(request, 'WebApp/leaderboard.html')
+    else:
+        # if error, say so and redirect back home
+        print("LEADERBOARD IMAGE GENERATION ERROR")
+        return redirect('home')
+    
+
+
+
+
+
+
 
 def is_developer(user):
     return user.user_type == 'developer'

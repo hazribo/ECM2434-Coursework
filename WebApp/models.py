@@ -8,4 +8,10 @@ class User(AbstractUser):
         ('developer', 'Developer'),
     )
     user_type = models.CharField(max_length=20, choices=USER_TYPES, default='player')
+
+    score = models.IntegerField(default=0)
+
+
+
+# class Score(models.Model):
     
