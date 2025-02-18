@@ -1,0 +1,12 @@
+{% extends 'WebApp/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+{% block content %}
+
+<h1>{{ profile.user.username }}</h1>
+<p>Score: {{ profile.score }}</p>
+
+{% endblock %}
+</html>
