@@ -15,18 +15,35 @@
             .navbar {
                 background-color: #003C3C; /* University of Exeter website colour */
             }
-                .navbar-brand:hover, .nav-link:hover {
+            .navbar-brand:hover, .nav-link:hover {
                 background-color: #002727 !important; /* Darker green on hover */
             }
             .navbar-brand, .nav-link {
                 color: white !important; /* Force white text */
                 font-weight: bold !important; /* Make text bold */
             }
-                .navbar-brand:hover, .nav-link:hover {
+            .navbar-brand:hover, .nav-link:hover {
                 color: #f8f9fa !important; /* Slightly lighter white on hover */
             }
             .main-content {
                 padding: 20px;
+            }
+            /* Custom style for the username link */
+            .username-link {
+                color: white !important; /* Ensure the username is white */
+                text-decoration: none !important; /* Remove underline */
+                padding: 0.5rem 0.2rem;
+            }
+            .username-link:hover {
+                background-color: #002727 !important;
+                color: #f8f9fa !important; 
+            }
+            /* Style for the "Logged in as" text */
+            .logged-in-text {
+                color: white !important; /* Match the navbar text color */
+                font-weight: bold !important; /* Match the navbar text weight */
+                padding: 0.5rem 0; /* Match the padding of .nav-link */
+                display: inline-block; /* Ensure it aligns properly */
             }
         </style>
     </head>
@@ -48,7 +65,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <span class="nav-link">Logged in as <strong>{{ user.username }}</strong></span>
+                            <span class="logged-in-text">Logged in as <a class="username-link" href="{% url 'profile' %}"><strong>{{ user.username }}</strong></a></span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'logout' %}">Logout</a>
@@ -66,7 +83,9 @@
     <!-- Local Bootstrap JS -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
-    {% block content %}
-    {% endblock content %}
+    <div class="container main-content">
+        {% block content %}
+        {% endblock content %}
+    </div>
   </body>
 </html>
