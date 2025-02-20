@@ -8,4 +8,5 @@ urlpatterns = [
     path("leaderboard/", leaderboard, name='leaderboard'),
     path('', home, name='home'),
     path('profile/', profile, name='profile'),
+    path('about', about, name='about'),
 ]

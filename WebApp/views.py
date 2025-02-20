@@ -9,6 +9,9 @@ from .leaderboard_src import generate_leaderboard_image
 def home(request):
     return render(request, 'WebApp/home.html')
 
+def about(request):
+    return render(request, 'WebApp/about.html')
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)

@@ -9,12 +9,14 @@
         <!-- Local Bootstrap CSS -->
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
         <style>
-            /* Custom styles */
             body {
                 padding-top: 56px; /* Adjust for fixed navbar */
             }
             .navbar {
                 background-color: #003C3C; /* University of Exeter website colour */
+            }
+                .navbar-brand:hover, .nav-link:hover {
+                background-color: #002727 !important; /* Darker green on hover */
             }
             .navbar-brand, .nav-link {
                 color: white !important; /* Force white text */
@@ -33,14 +35,14 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="/">Coursework</a>
+            <a class="navbar-brand" href="/">Green Beans</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                        <a class="nav-link" href="{% url 'about' %}">About</a>
                     </li>                  
                 </ul>
                 <ul class="navbar-nav ms-auto">
@@ -53,13 +55,14 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <span class="nav-link">Not logged in. <a href="{% url 'login' %}">Login?</a></span>
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
     <!-- Local Bootstrap JS -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
