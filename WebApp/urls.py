@@ -10,4 +10,5 @@ urlpatterns = [
     path('profile/', redirect_to_profile, name='redirect_to_profile'),
     path('profile/<str:username>/', profile, name='profile'),
     path('about', about, name='about'),
+    path('game', game, name='game'),
 ]

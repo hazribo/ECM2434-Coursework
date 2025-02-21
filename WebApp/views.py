@@ -13,6 +13,10 @@ def home(request):
 def about(request):
     return render(request, 'WebApp/about.html')
 
+@login_required
+def game(request):
+    return render(request, 'WebApp/game.html')
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
