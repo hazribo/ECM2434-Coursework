@@ -48,24 +48,30 @@
         </style>
     </head>
 
+
+
 <body>     
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
-        <div class="container">
+        <div class="container">  
             <a class="navbar-brand" href="/">Green Beans</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item active">
                         <a class="nav-link" href="{% url 'about' %}">About</a>
                     </li>                  
                 </ul>
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto"> <!-- Keeps login/logout to the right -->
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <span class="logged-in-text">Logged in as <a class="username-link" href="{% url 'profile' username=user.username %}"><strong>{{ user.username }}</strong></a></span>
+                            <span class="logged-in-text">Logged in as 
+                                <a class="username-link" href="{% url 'profile' username=user.username %}">
+                                    <strong>{{ user.username }}</strong>
+                                </a>
+                            </span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'logout' %}">Logout</a>
@@ -78,7 +84,35 @@
                 </ul>
             </div>
         </div>
+        <form class="d-flex search-bar" action="{% url 'profile' username='temp_user' %}" method="GET" id="search-form"> 
+            <input class="form-control me-2" type="search" name="username" placeholder="Search users..." aria-label="Search" id="search-input">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
     </nav>
+
+    <!-- CSS for Search Bar -->
+     <style>
+        .search-bar {
+            position: absolute;
+            right: 15px; /* Ensures it sticks to the right */
+            top: 50%;
+            transform: translateY(-50%); /* Vertically centers it */
+            display: flex;
+            align-items: center;
+        }
+    </style>
+
+    <!-- JS for Search Bar -->
+    <script>
+        document.getElementById('search-form').addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent the default form submission
+        const username = document.getElementById('search-input').value.trim();
+        if (username) {
+            this.action = `/profile/${encodeURIComponent(username)}/`;
+            this.submit();
+        }
+    });
+    </script>
 
     <!-- Local Bootstrap JS -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
