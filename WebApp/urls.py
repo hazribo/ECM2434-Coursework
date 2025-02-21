@@ -7,6 +7,7 @@ urlpatterns = [
     path('logout/', user_logout, name='logout'),
     path("leaderboard/", leaderboard, name='leaderboard'),
     path('', home, name='home'),
-    path('profile/', profile, name='profile'),
+    path('profile/', redirect_to_profile, name='redirect_to_profile'),
+    path('profile/<str:username>/', profile, name='profile'),
     path('about', about, name='about'),
 ]

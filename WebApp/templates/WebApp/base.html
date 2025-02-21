@@ -65,7 +65,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <span class="logged-in-text">Logged in as <a class="username-link" href="{% url 'profile' %}"><strong>{{ user.username }}</strong></a></span>
+                            <span class="logged-in-text">Logged in as <a class="username-link" href="{% url 'profile' username=user.username %}"><strong>{{ user.username }}</strong></a></span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'logout' %}">Logout</a>
