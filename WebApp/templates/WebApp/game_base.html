@@ -83,7 +83,7 @@
         event.preventDefault();  // Prevent the default form submission
         const username = document.getElementById('search-input').value.trim();
         if (username) {
-            this.action = `/profile/${encodeURIComponent(username)}/`;
+            this.action = `/search/`;
             this.submit();
         }
     });

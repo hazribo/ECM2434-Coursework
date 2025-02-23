@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.views.generic import ListView
 from .models import User
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile
 from .forms import UserRegistrationForm
 from .leaderboard_src import generate_leaderboard_image
+from .search_src import searchForUsername
 
 def home(request):
     return render(request, 'WebApp/home.html')
@@ -16,6 +18,20 @@ def about(request):
 @login_required
 def game(request):
     return render(request, 'WebApp/game.html')
+
+
+_NoSearchString = "NONE"
+def search(request):
+    username = request.GET.get('username', _NoSearchString)
+    matches = searchForUsername(username)
+
+    context = { 
+        "search_name" : username,
+        "results" : matches,
+        "anyfound" : (len(matches) > 0)
+    }
+
+    return render(request, "WebApp/search.html", context)
 
 def register(request):
     if request.method == 'POST':

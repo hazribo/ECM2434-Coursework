@@ -11,4 +11,5 @@ urlpatterns = [
     path('profile/<str:username>/', profile, name='profile'),
     path('about', about, name='about'),
     path('game', game, name='game'),
+    path("search/", search, name = "user search")
 ]

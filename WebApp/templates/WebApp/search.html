@@ -1,0 +1,29 @@
+﻿{% extends 'WebApp/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+{% block content %}
+
+
+
+<h1>Search results for {{ search_name }}</h1>
+
+{% if not anyfound %}
+
+<h3>*Nothing found*</h3>
+
+{% endif %}
+<ul>
+    {% for User in results %}
+    <li>
+        <a href={{ User.link }}>{{ User.username }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href ="../game">go back</a>
+
+
+{% endblock %}
+</html>
