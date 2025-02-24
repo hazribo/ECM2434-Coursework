@@ -5,7 +5,7 @@ from django.views.generic import ListView
 from .models import User
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, ProfileUpdateForm
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import searchForUsername
 
@@ -84,6 +84,17 @@ def profile(request, username=None):
     user = get_object_or_404(User, username=username)
     user_profile = get_object_or_404(Profile, user=user)
     return render(request, 'WebApp/profile.html', {'profile': user_profile})
+
+@login_required
+def profile_update(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', username=request.user.username)
+    else:
+        form = ProfileUpdateForm(instance=request.user.profile)
+    return render(request, 'WebApp/profile_update.html', {'form': form})
 
 def redirect_to_profile(request):
     if request.user.is_authenticated:

@@ -1,12 +1,111 @@
-{% extends 'WebApp/base.html' %}
+{% extends 'WebApp/game_base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 {% block content %}
 
-<h1>{{ profile.user.username }}</h1>
-<p>Score: {{ profile.score }}</p>
+<div class="profile-container">
+    <div class="profile-layout">
+        <div class="profile-left">
+            <div class="profile-picture">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}'s Profile Picture" width="150">
+                {% else %}
+                    <p>No profile picture uploaded.</p>
+                {% endif %}
+            </div>
+
+            <div class="profile-name">
+                <h2>{{ profile.user.username }}</h2>
+            </div>
+
+            <div class="profile-score">
+                <h3>Score: {{ profile.score }}</h3>
+            </div>
+        </div>
+
+        <div class="profile-right">
+            <div class="bio">
+                <h3>Bio:</h3>
+                <p>{{ profile.bio|default:"No bio provided." }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Allow user to edit their own profile: -->
+    {% if request.user == profile.user %}
+        <div class="edit-profile-button">
+            <a href="{% url 'profile_update' %}" class="btn btn-primary">Edit Profile</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+    .profile-layout {
+        display: flex;
+        gap: 20px; 
+    }
+    .profile-left {
+        flex: 1;
+        text-align: center; 
+    }
+    .profile-right {
+        flex: 2;
+    }
+    .profile-picture img {
+        border: 2px solid #003C3C; 
+    }
+    .profile-name h2 {
+        margin: 10px 0 5px 0; 
+    }
+    .profile-score h3 {
+        margin: 5px 0; 
+        color: #555; 
+    }
+    .bio h3 {
+        margin-top: 0; 
+    }
+    .bio p {
+        margin: 10px 0; 
+        line-height: 1.6; 
+    }
+    .edit-profile-button {
+        margin-top: 20px;
+        text-align: center; 
+    }
+
+    /* For "Edit Profile" button: */
+    .btn {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    /* For mobile device viewing: */
+    @media (max-width: 600px) {
+    .profile-layout {
+        flex-direction: column; /* Stack left and right sections vertically */
+    }
+    .profile-left {
+        margin-bottom: 20px; /* Add space between stacked sections */
+    }
+}
+</style>
 
 {% endblock %}
 </html>

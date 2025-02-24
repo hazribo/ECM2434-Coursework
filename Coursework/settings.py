@@ -104,6 +104,9 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = 'WebApp.User'
 LOGIN_URL = '/login/'
 
+MEDIA_URL = '/WebApp/media/'  
+MEDIA_ROOT = os.path.join(BASE_DIR, 'WebApp', 'media') 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
