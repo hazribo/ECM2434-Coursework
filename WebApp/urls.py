@@ -15,6 +15,7 @@ urlpatterns = [
     path('game', game, name='game'),
     path('search/', search, name = "user search"),
     path('profile_update', profile_update, name='profile_update'),
+    path('missions', missions, name='missions'),
 ]
 
 if settings.DEBUG:

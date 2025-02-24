@@ -17,6 +17,10 @@ def about(request):
 def game(request):
     return render(request, 'WebApp/game.html')
 
+@login_required
+def missions(request):
+    return render(request, 'WebApp/missions.html')
+
 _NoSearchString = "NONE"
 def search(request):
     username = request.GET.get('username', _NoSearchString)

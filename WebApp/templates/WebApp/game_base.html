@@ -38,22 +38,45 @@
                 background-color: #002727 !important;
                 color: #f8f9fa !important; 
             }
+            .menu-link {
+                font-size: 1rem !important; 
+                font-weight: bold !important;
+                text-transform: uppercase;
+                color: #FFD700 !important; /* Gold color */
+            }
+            .menu-link:hover {
+                color: #FFC107 !important; /* Slightly darker gold on hover */
+            }
+            .navbar-center {
+            flex: 3; /* Allow this to take available space */
+            display: flex;
+            justify-content: center;
+            }   
         </style>
     </head>
-
-
 
 <body>     
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">  
-            <a class="navbar-brand" href="/">Green Beans</a>
+            <a class="navbar-brand" href="/game">Green Beans</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto"> <!-- Keeps login/logout to the right -->
-                    <li class="nav-item">
+                <ul class="navbar-nav w-100 d-flex justify-content-between"> <!-- Full width and equal spacing -->
+                    <div class="navbar-center">
+                        <li class="nav-item active mx-5">
+                            <a class="nav-link menu-link" href="{% url 'missions' %}">MISSIONS</a>
+                        </li>
+                        <li class="nav-item active mx-5">
+                            <a class="nav-link menu-link" href="{% url 'leaderboard' %}">LEADERBOARD</a>
+                        </li> 
+                        <li class="nav-item active mx-5">
+                            <a class="nav-link menu-link" href="{% url 'profile' username=user.username %}">MY PROFILE</a>
+                        </li>
+                    </div>
+                    <li class="nav-item"> <!-- Logout pushed to the right -->
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
                 </ul>
