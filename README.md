@@ -62,5 +62,11 @@ deactivate
 
 # How to test basic functionalities:
 `http://127.0.0.1:8000/register/` - debug option for setting user type (player, game keeper, developer).
+
 Any other tests can be found in the tests.py file.
+You can run them by using:
+```bash
+python manage.py test
+```
+in the terminal in the project directory.
 
