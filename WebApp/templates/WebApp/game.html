@@ -2,6 +2,12 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
-
-</html>
+    {% block content %}
+    <div class="container main-content">
+        <h1>Feed Your Pet!</h1>
+        <p>Complete challenges to feed your pet!</p>
+        <p></p>
+        <img src="{% static 'gbc2.gif' %}" alt="Bean" />
+    </div>
+{% endblock %}
+    </html>
