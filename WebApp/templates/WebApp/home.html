@@ -5,17 +5,16 @@
 
 {% block content %}
     <div class="container main-content">
-        <h1 style="color:green; font-family:Courier New;">Group Software Engineering Project: Green Beans!</h1>
-        <p class="lead">Hello!</p>
+        <h1 style="color:White; background-color:Limegreen; font-family:Tahoma;"><b>Group Software Engineering Project: Green Beans!</b></h1>
+        <div style="text-align: center;">
+            <img src="{% static 'gbc1.jpg' %}" alt="Pet Image" />
+        </div>
+        <p class="lead"; color:Limegreen;>Hello!</p>
         <p>Welcome to Green Beans! This a group developed web app with the goal of promoting sustainability and eco friendly</p>
         <p>practises at the University Of Exeter. As part of the app, users will get their very own Green Bean Pet, which</p>
         <p>they can feed by completing challenges. These challenges range from walking to recycling, all which allow users</p>
         <p>to gain points and climb the leaderboard. See if you and your Green Bean can reach the top!</p>
         <p></p>
-        <img src="{% static 'bean1.jpg' %}" alt="Bean" />
-        <img src="{% static 'bean2.jpg' %}" alt="Bean" />
-        <img src="{% static 'bean3.jpg' %}" alt="Bean" />
-        <img src="{% static 'bean4.png' %}" alt="Bean" />
         <p class="lead">Our Goals</p>
         <p>Our goal is to help promote sustainable practises on the University of Exeter campus. The university aims by 2030</p>
         <p>to have a carbon net zero impact, and we all can easily help achieve this in our everyday lives. We wish to show</p>
@@ -27,6 +26,12 @@
         <img src="{% static 'gbc1.jpg' %}" alt="Pet Image" />
         <p class="lead">How Do I Start?</p>
         <p>To get your own pet, register an account with us and then you can get straight into the challenges!</p>
+        <div style="text-align: center;">
+            <img src="{% static 'bean1.jpg' %}" alt="Bean" />
+            <img src="{% static 'bean2.jpg' %}" alt="Bean" />
+            <img src="{% static 'bean3.jpg' %}" alt="Bean" />
+            <img src="{% static 'bean4.png' %}" alt="Bean" />
+        </div>
     </div>
 {% endblock %}
 </html>
