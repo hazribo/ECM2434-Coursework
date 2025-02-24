@@ -41,7 +41,10 @@ Install the required dependencies to the virtual environment:
 pip install -r requirements.txt
 ```
 
-## 5. Run the Server
+## 5. Migrate Database
+Run the `migrate_database.bat` file to ensure a valid database is created for the app to use.
+
+## 6. Run the Server
 Start the server using:
 
 ```bash
@@ -49,11 +52,15 @@ python manage.py runserver
 ```
 
 By default, the server will run at `http://127.0.0.1:8000/`.
-Currently, the pages `http://127.0.0.1:8000/login`, `http://127.0.0.1:8000/register` and `http://127.0.0.1:8000/leaderboard` are active with a basic user registration and score leaderboard system.
 
-## 6. Exit Venv
+## 7. Exit Venv
 To exit the virtual environment, run:
 
 ```bash
 deactivate
 ```
+
+# How to test basic functionalities:
+`http://127.0.0.1:8000/register/` - debug option for setting user type (player, game keeper, developer).
+Any other tests can be found in the tests.py file.
+
