@@ -1,5 +1,5 @@
 
-from .models import User
+from .models import Profile
 
 # HAS TO BE RUN BEFORE import pyplot
 # or server crashes becuase django tries to run matplot lib gui in non
@@ -16,9 +16,9 @@ def generate_leaderboard_image():
 
     try:
         # get data
-        database = User.objects.values_list;
-        names = [item[0] for item in database("username")]
-        scores = [item[0] for item in database("score")]
+        profiles = Profile.objects.all().order_by('-score')  
+        names = [profile.user.username for profile in profiles]  
+        scores = [profile.score for profile in profiles]  
         
         # plot data
         plt.bar(names, scores)

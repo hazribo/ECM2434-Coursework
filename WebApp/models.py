@@ -32,4 +32,22 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+# Code for missions:
+class Mission(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    points = models.IntegerField(default=10)
+
+    def __str__(self):
+        return self.name
+
+class UserMission(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    mission = models.ForeignKey(Mission, on_delete=models.CASCADE)
+    completed = models.BooleanField(default=False)
+    date_completed = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.mission.name}"
         

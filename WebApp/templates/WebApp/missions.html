@@ -1,5 +1,68 @@
 {% extends 'WebApp/game_base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-    </html>
+
+{% block content %}
+<div class="container">
+    <h1>Daily Missions</h1>
+    <ul class="missions-list">
+        {% for mission in missions %}
+            <li class="mission-item">
+                <h3>{{ mission.name }}</h3>
+                <p>{{ mission.description }}</p>
+                <p>Points: {{ mission.points }}</p>
+                {% for user_mission in user_missions %}
+                    {% if user_mission.mission == mission %}
+                        <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
+                        <form class="complete-mission-form" data-mission-id="{{ mission.id }}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">
+                                {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $(".complete-mission-form").submit(function(event) {
+            event.preventDefault(); 
+
+            var form = $(this);
+            var missionId = form.data("mission-id");
+            var button = form.find("button");
+            var statusElement = form.siblings(".mission-status");
+
+            $.ajax({
+                url: "{% url 'missions' %}", 
+                type: "POST",
+                data: {
+                    mission_id: missionId,
+                    csrfmiddlewaretoken: form.find("input[name='csrfmiddlewaretoken']").val()
+                },
+                success: function(response) {
+                    if (response.status === "success") {
+                        // Update text/status:
+                        if (response.completed) {
+                            button.text("Undo");
+                            statusElement.text("Status: Completed");
+                        } else {
+                            button.text("Complete");
+                            statusElement.text("Status: Not Completed");
+                        }
+                    }
+                },
+                // Alert on error:
+                error: function() {
+                    alert("An error occurred. Please try again.");
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

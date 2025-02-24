@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.http import JsonResponse
+from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
-from .models import User, Profile
+from django.core.management import call_command
+from .models import User, Profile, Mission, UserMission
 from .forms import UserRegistrationForm, ProfileUpdateForm
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
@@ -102,6 +105,58 @@ def redirect_to_profile(request):
     else:
         # redirect to login if not logged in - no profile to show:
         return redirect('login')
+
+# For missions:
+@login_required
+def missions(request):
+    # Check if missions exist; if not, generate them:
+    if not Mission.objects.exists():
+        call_command('generate_missions')  # Run the generate_missions.py script (in WebApp/management/commands/)
+
+    if request.method == "POST":
+        mission_id = request.POST.get("mission_id")
+        mission = Mission.objects.get(id=mission_id)
+        today = timezone.now().date()
+
+        # Get UserMission instance:
+        user_mission, created = UserMission.objects.get_or_create(
+            user=request.user,
+            mission=mission,
+            date_completed=today
+        )
+
+        # Toggle completion status:
+        user_mission.completed = not user_mission.completed
+        user_mission.save()
+
+        # Award (and deduct, debug option) points:
+        profile = request.user.profile
+        if user_mission.completed:
+            profile.score += mission.points
+        else:
+            profile.score -= mission.points
+        profile.save()
+
+        # JSON response:
+        return JsonResponse({
+            "status": "success",
+            "completed": user_mission.completed
+        })
+
+    # Handle GET request (display missions):
+    today = timezone.now().date()
+    missions = Mission.objects.all()
+    user_missions = UserMission.objects.filter(user=request.user, date_completed=today)
+
+    # Create UserMission objects for any unstarted missions:
+    for mission in missions:
+        UserMission.objects.get_or_create(user=request.user, mission=mission, date_completed=today)
+
+    context = {
+        'missions': missions,
+        'user_missions': user_missions,
+    }
+    return render(request, 'WebApp/missions.html', context)
 
 def is_developer(user):
     return user.user_type == 'developer'
