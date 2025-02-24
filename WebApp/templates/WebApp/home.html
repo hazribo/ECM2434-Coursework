@@ -4,8 +4,33 @@
 <html lang="en">
 
 {% block content %}
-    <h1>Hello!</h1>
-    <p class="lead">Text here about something</p>        
-    <p>Probably put a link here to check location or something cheesy about beans who knows</p>
+    <div class="container main-content">
+        <h1 style="color:Limegreen; font-family:Tahoma; text-align: center;"><b>Group Software Engineering Project: Green Beans!</b></h1>
+        <div style="text-align: center;">
+            <img src="{% static 'gbc1.jpg' %}" alt="Pet Image" />
+        </div>
+        <p class="lead"; style="color:Limegreen; font-size:160%;"><b>Hello!</b></p>
+        <p style="text-align: center;">Welcome to Green Beans! This a group developed web app with the goal of promoting sustainability and eco friendly</p>
+        <p style="text-align: center;">practises at the University Of Exeter. As part of the app, users will get their very own Green Bean Pet, which</p>
+        <p style="text-align: center;">they can feed by completing challenges. These challenges range from walking to recycling, all which allow users</p>
+        <p style="text-align: center;">to gain points and climb the leaderboard. See if you and your Green Bean can reach the top!</p>
+        <p></p>
+        <p class="lead"; style="color:Limegreen; font-size:160%;"><b>Our Goals</b></p>
+        <p style="text-align: center;">Our goal is to help promote sustainable practises on the University of Exeter campus. The university aims by 2030</p>
+        <p style="text-align: center;">to have a carbon net zero impact, and we all can easily help achieve this in our everyday lives. We wish to show</p>
+        <p style="text-align: center;">how a few small changes can have a big impact on the environment, whether it be walking instead of driving or </p>
+        <p style="text-align: center;">using a recyling bin instead of a regular one. We also want to encourage users to explore the University campus</p>
+        <p style="text-align: center;">with location based challenges that help show off some natural beauty. The best part is you get to do it alongside</p>
+        <p style="text-align: center;">a cute little green bean pet!</p>
+        <p></p>
+        <p class="lead"; style="color:Limegreen; font-size:160%;";><b>How Do I Start?</b></p>
+        <p style="text-align: center;">To get your own pet, register an account with us and then you can get straight into the challenges!</p>
+        <div style="text-align: center;">
+            <img src="{% static 'bean1.jpg' %}" alt="Bean" />
+            <img src="{% static 'bean2.jpg' %}" alt="Bean" />
+            <img src="{% static 'bean3.jpg' %}" alt="Bean" />
+            <img src="{% static 'bean4.png' %}" alt="Bean" />
+        </div>
+    </div>
 {% endblock %}
 </html>
