@@ -17,7 +17,16 @@
 <ul>
     {% for User in results %}
     <li>
+
         <a href={{ User.link }}>{{ User.username }}</a>
+
+        {% if User.has_profile_pic %}
+        <img src={{ User.profile_picture_path }}
+             style="width:100px;height:100px;" />
+        {% else %}
+        <img src={% static 'nopfp.png' %}
+             style="width:100px;height:100px;" />
+        {% endif %}
     </li>
     {% endfor %}
 </ul>
