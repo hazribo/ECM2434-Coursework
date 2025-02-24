@@ -70,7 +70,8 @@ def leaderboard(request):
         # if error, say so and redirect back home
         print("LEADERBOARD IMAGE GENERATION ERROR")
         return redirect('home')
-    
+
+@login_required
 def profile(request, username=None):
     # No username provided; redirect to profile of user:
     if not username:
