@@ -21,6 +21,9 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
+    friend_requests = models.ManyToManyField(User, related_name = "friend_requests")
+    friend_list = models.ManyToManyField(User, related_name = "friend_list")
+
     def __str__(self):
         return f'{self.user.username} Profile'
     

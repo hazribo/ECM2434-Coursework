@@ -1,4 +1,4 @@
-{% extends 'WebApp/game_base.html' %}
+﻿{% extends 'WebApp/game_base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -10,9 +10,9 @@
         <div class="profile-left">
             <div class="profile-picture">
                 {% if profile.profile_picture %}
-                    <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}'s Profile Picture" width="150">
+                <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}'s Profile Picture" width="150">
                 {% else %}
-                    <p>No profile picture uploaded.</p>
+                <p>No profile picture uploaded.</p>
                 {% endif %}
             </div>
 
@@ -35,20 +35,187 @@
 
     <!-- Allow user to edit their own profile: -->
     {% if request.user == profile.user %}
-        <div class="edit-profile-button">
-            <a href="{% url 'profile_update' %}" class="btn btn-primary">Edit Profile</a>
-        </div>
+    <div class="edit-profile-button">
+        <a href="{% url 'profile_update' %}" class="btn btn-primary">Edit Profile</a>
+    </div>
     {% endif %}
+
+
+
+
+
 </div>
+
+{% if request.user == profile.user %}
+
+<div class="friend_req_div">
+
+    <h2>friend requests</h2>
+
+
+    {% for reqProfile in req_list %}
+
+    {% if reqProfile.hasPfp %}
+    <img class="pfp_thumbnail" src={{ reqProfile.pfpUrl }} />
+    {% else %}
+    <img class="pfp_thumbnail" src={% static 'nopfp.png' %} />
+    {% endif %}
+    <a href={{ reqProfile.link }}>{{ reqProfile.name }}</a>
+
+    <div>
+        <form action={{ reqProfile.acceptURL }}>
+            <button class="friend_accept_button" id={{ reqProfile.name }} type="submit">accept</button>
+        </form>
+        <form action={{ reqProfile.rejectURL }}>
+            <button class="friend_reject_button" id={{ reqProfile.name }} type="submit">reject</button>
+        </form>
+    </div>
+
+    {% endfor %}
+
+
+</div>
+
+{% endif %}
+
+<div class="friend_list_div">
+    <h2>friends</h2>
+
+    {% for friendProfile in friend_list %}
+
+    <div>
+        {% if friendProfile.hasPfp %}
+        <img class="pfp_thumbnail" src={{ friendProfile.pfpUrl }} />
+        {% else %}
+        <img class="pfp_thumbnail" src={% static 'nopfp.png' %} />
+        {% endif %}
+        <a href={{ friendProfile.link }}>{{ friendProfile.name }}</a>
+    </div>
+
+    {% endfor %}
+
+
+</div>
+
 
 <div class="container main-content">
     <h1 style="text-align: center;">Your Pet!</h1>
     <div style="text-align: center;">
-    <img src="{% static 'gbc3.png' %}" alt="Bean" width="250" height="250"/>
+        <img src="{% static 'gbc3.png' %}" alt="Bean" width="250" height="250" />
     </div>
 </div>
 
+
+
+<script>
+
+    for (let button of document.getElementsByClassName("friend_reject_button")) {
+        button.addEventListener("click", function () {
+            button.innerHTML = "✔";
+            //window.alert("rejected friend request from " + button.id);
+        });
+    }
+
+    for (let button of document.getElementsByClassName("friend_accept_button")) {
+        button.addEventListener("click", function () {
+            button.innerHTML = "✔";
+            //window.alert("accepted friend request from " + button.id);
+        });
+    }
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
 <style>
+
+    .friend_accept_button {
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        border-radius: 6px;
+        font-family: Georgia;
+        color: #000000;
+        font-size: 16px;
+        background: #45de1b;
+        padding: 2px 4px 4px 4px;
+        border: solid #1f5e00 3px;
+        text-decoration: none;
+    }
+
+        .friend_accept_button:hover {
+            background: #36ab16;
+            text-decoration: none;
+        }
+
+        .friend_accept_button:active {
+            background: #a4db95;
+            text-decoration: none;
+        }
+
+    .friend_reject_button {
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        border-radius: 6px;
+        font-family: Georgia;
+        color: #000000;
+        font-size: 16px;
+        background: #d11002;
+        padding: 2px 4px 4px 4px;
+        border: solid #000000 3px;
+        text-decoration: none;
+    }
+
+        .friend_reject_button:hover {
+            background: #910d03;
+            text-decoration: none;
+        }
+
+        .friend_reject_button:active {
+            background: #fc4335;
+            text-decoration: none;
+        }
+
+    .pfp_thumbnail {
+        border-width: 6px;
+        border-color: black;
+        width: 64px;
+        height: 64px;
+    }
+
+    .friend_req_result_list_item {
+        position: center;
+        border-width: 6px;
+        border-color: #003d33;
+    }
+
+    .friend_list_div {
+        position: absolute;
+        right: 32px;
+        border-top: 9px solid #003c3c;
+        border-right: 9px double #003c3c;
+        border-bottom: 9px double #003c3c;
+        border-left: 9px double #003c3c;
+        width: 256px
+    }
+
+    .friend_req_div {
+        position: absolute;
+        left: 32px;
+        border-top: 9px solid #003c3c;
+        border-right: 9px double #003c3c;
+        border-bottom: 9px double #003c3c;
+        border-left: 9px double #003c3c;
+        width: 256px
+    }
+
     .profile-container {
         max-width: 800px;
         margin: 0 auto;
@@ -57,48 +224,58 @@
         border-radius: 5px;
         background-color: #f9f9f9;
     }
+
     .profile-layout {
         display: flex;
-        gap: 20px; 
+        gap: 20px;
     }
+
     .profile-left {
         flex: 1;
-        text-align: center; 
+        text-align: center;
     }
+
     .profile-right {
         flex: 2;
     }
+
     .profile-picture img {
-        border: 2px solid #003C3C; 
+        border: 2px solid #003C3C;
     }
+
     .profile-name h2 {
-        margin: 10px 0 5px 0; 
+        margin: 10px 0 5px 0;
     }
+
     .profile-score h3 {
-        margin: 5px 0; 
-        color: #555; 
+        margin: 5px 0;
+        color: #555;
     }
+
     .bio h3 {
-        margin-top: 0; 
+        margin-top: 0;
     }
+
     .bio p {
-        margin: 10px 0; 
-        line-height: 1.6; 
+        margin: 10px 0;
+        line-height: 1.6;
     }
+
     .edit-profile-button {
         margin-top: 20px;
-        text-align: center; 
+        text-align: center;
     }
-    
+
     /* For mobile device viewing: */
     @media (max-width: 600px) {
-    .profile-layout {
-        flex-direction: column; /* Stack left and right sections vertically */
+        .profile-layout {
+            flex-direction: column; /* Stack left and right sections vertically */
+        }
+
+        .profile-left {
+            margin-bottom: 20px; /* Add space between stacked sections */
+        }
     }
-    .profile-left {
-        margin-bottom: 20px; /* Add space between stacked sections */
-    }
-}
 </style>
 
 {% endblock %}

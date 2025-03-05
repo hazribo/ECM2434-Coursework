@@ -7,7 +7,8 @@ def _match(input_username, database_username):
         input_username in database_username     \
         or                                      \
         database_username in input_username
-        
+
+
 def get_profile_picture_path_SQL(username):
     return                                    \
         "SELECT profile_picture "            + \
@@ -22,6 +23,7 @@ class SearchResult:
     score = None
     profile_picture_path = None
     has_profile_pic = None
+    idVal = None
 
 # Get list of names that match with input_username:
 def search_for_username(input_username):
@@ -37,6 +39,7 @@ def search_for_username(input_username):
         result.username = user.username
         result.score = None
         result.link = f"../../profile/{user.username}"
+        result.idVal = f'{user.id}/'
 
         profile = Profile.objects.filter(user=user).first()
         if profile and profile.profile_picture:

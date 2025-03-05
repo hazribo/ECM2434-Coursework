@@ -1,14 +1,40 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import call_command
 from .models import User, Profile, Mission, UserMission
 from .forms import UserRegistrationForm, ProfileUpdateForm
+
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
+from .friendsystem_src import recordFriendRequestResponse, send_friend_request, get_friend_request_list, get_friend_list
+
+
+
+_IGNORE_PASSWORD_REQS = True
+_NoSearchString = "NONE"
+
+
+
+
+
+# returned by view function in order to not change the page
+# active at all
+def unchanged(request, *args, **kwargs):
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def acceptReq(request, accepterId, acceptedId, **kwargs):
+    recordFriendRequestResponse(accepterId, acceptedId, True)
+    return unchanged(request)
+
+def rejectReq(request, rejecterId, rejectedId, **kwargs):
+    recordFriendRequestResponse(rejecterId, rejectedId, False)
+    return unchanged(request)
+
 
 def home(request):
     return render(request, 'WebApp/home.html')
@@ -24,7 +50,13 @@ def game(request):
 def missions(request):
     return render(request, 'WebApp/missions.html')
 
-_NoSearchString = "NONE"
+@login_required
+def addfriend(request, idVal = None):
+    send_friend_request(request.user.id, idVal)
+    return unchanged(request);
+
+
+
 def search(request):
     username = request.GET.get('username', _NoSearchString)
     matches = search_for_username(username)
@@ -38,7 +70,7 @@ def search(request):
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() or _IGNORE_PASSWORD_REQS:
             user = form.save()
             login(request, user)
             return redirect('home')  # Redirect to home page
@@ -86,7 +118,17 @@ def profile(request, username=None):
     # Get data for provided username to display correct profile:
     user = get_object_or_404(User, username=username)
     user_profile = get_object_or_404(Profile, user=user)
-    return render(request, 'WebApp/profile.html', {'profile': user_profile})
+
+    friend_request_list = get_friend_request_list(user_profile);
+    friend_list = get_friend_list(user_profile)
+
+    context = {
+        'profile': user_profile,
+        'req_list' : friend_request_list,
+        'friend_list' : friend_list
+    };
+
+    return render(request, 'WebApp/profile.html', context)
 
 @login_required
 def profile_update(request):

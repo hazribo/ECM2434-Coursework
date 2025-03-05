@@ -21,9 +21,58 @@
              style="width:50px;height:50px;" />
         {% endif %}
         <a href={{ User.link }}>{{ User.username }}</a>
+
+        <!--<form action={{ User.idVal }} id={{ User.idVal }}>
+        <button class="friend_add_button" type="submit">+</button>
+        </form>-->
+
+        <form action={{ User.idVal }}>
+            <button class="friend_add_button"  id={{ User.username }} type="submit">+</button>
+        </form>
+
     </li>
     {% endfor %}
 </ul>
+
+<script>
+
+    let buttons = document.getElementsByClassName("friend_add_button");
+    for (let button of buttons) {
+        button.addEventListener("click", function () {
+            button.innerHTML = "✔";
+            window.alert("sent friend request to " + button.id);
+        });
+    }
+    
+
+</script>
+
+<style>
+    .friend_add_button {
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        border-radius: 6px;
+        font-family: Georgia;
+        color: #000000;
+        font-size: 16px;
+        background: #45de1b;
+        padding: 2px 4px 4px 4px;
+        border: solid #1f5e00 3px;
+        text-decoration: none;
+    }
+        .friend_add_button:hover {
+            background: #36ab16;
+            text-decoration: none;
+        }
+        .friend_add_button:active {
+            background: #a4db95;
+            text-decoration: none;
+        }
+    .friend_already_added_button{
+
+    }
+
+</style>
 
 {% endblock %}
 </html>

@@ -2,6 +2,13 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User, Profile
 
+'''
+        <form class="d-flex search-bar" action="{% url 'profile' username='temp_user' %}" method="GET" id="search-form"> 
+            <input class="form-control me-2" type="search" name="username" placeholder="Search users..." aria-label="Search" id="search-input">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+'''
+
 class UserRegistrationForm(UserCreationForm):
     user_type = forms.ChoiceField(choices=User.USER_TYPES)
 
