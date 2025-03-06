@@ -11,6 +11,7 @@ from .forms import UserRegistrationForm, ProfileUpdateForm
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
 from .friendsystem_src import recordFriendRequestResponse, send_friend_request, get_friend_request_list, get_friend_list
+from .missions_src import get_user_missions
 
 
 
@@ -44,7 +45,22 @@ def about(request):
 
 @login_required
 def game(request):
-    return render(request, 'WebApp/game.html')
+    username=request.user.username
+        
+    # Get data for provided username to display correct profile:
+    user = get_object_or_404(User, username=username)
+    user_profile = get_object_or_404(Profile, user=user)
+
+    friend_list = get_friend_list(user_profile)
+
+    user_missions = get_user_missions(user_profile)
+
+    context = {
+        'profile': user_profile,
+        'friend_list' : friend_list,
+        'user_missions': user_missions
+    }
+    return render(request, 'WebApp/game.html', context)
 
 @login_required
 def missions(request):
