@@ -10,29 +10,24 @@ from .forms import UserRegistrationForm, ProfileUpdateForm
 
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
-from .friendsystem_src import recordFriendRequestResponse, send_friend_request, get_friend_request_list, get_friend_list
+from .friendsystem_src import record_friend_request_response, send_friend_request, get_friend_request_list, get_friend_list
 
 
-
+# Friend system code:
 _IGNORE_PASSWORD_REQS = True
 _NoSearchString = "NONE"
-
-
-
-
 
 # returned by view function in order to not change the page
 # active at all
 def unchanged(request, *args, **kwargs):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-
-def acceptReq(request, accepterId, acceptedId, **kwargs):
-    recordFriendRequestResponse(accepterId, acceptedId, True)
+def accept_req(request, accepter_id, accepted_id, **kwargs):
+    record_friend_request_response(accepter_id, accepted_id, True)
     return unchanged(request)
 
-def rejectReq(request, rejecterId, rejectedId, **kwargs):
-    recordFriendRequestResponse(rejecterId, rejectedId, False)
+def reject_req(request, rejecter_id, rejected_id, **kwargs):
+    record_friend_request_response(rejecter_id, rejected_id, False)
     return unchanged(request)
 
 
