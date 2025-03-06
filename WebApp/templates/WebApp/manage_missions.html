@@ -1,0 +1,32 @@
+{% extends 'WebApp/game_base.html' %}
+
+{% block content %}
+<h1>Manage Missions</h1>
+
+<h2>Add/Edit Mission</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Mission</button>
+</form>
+
+<h2>Current Missions</h2>
+<ul>
+  {% for mission in missions %}
+    <li>
+      {{ mission.name }}: {{ mission.description }} (Points: {{ mission.points }})
+      <form method="POST" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="mission_id" value="{{ mission.id }}">
+        <button type="submit">Edit</button>
+      </form>
+      <form method="POST" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="delete_mission_id" value="{{ mission.id }}">
+        <button type="submit">Delete</button>
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

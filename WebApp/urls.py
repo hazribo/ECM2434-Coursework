@@ -11,14 +11,15 @@ urlpatterns = [
     path('', home, name='home'),
     path('profile/', redirect_to_profile, name='redirect_to_profile'),
     path('profile/<str:username>/', profile, name='profile'),
-    path("profile/<str:username>/accept/<str:accepterId>/<str:acceptedId>", acceptReq),
-    path("profile/<str:username>/reject/<str:rejecterId>/<str:rejectedId>", rejectReq),
+    path("profile/<str:username>/accept/<str:accepterId>/<str:accepted_id>", accept_req),
+    path("profile/<str:username>/reject/<str:rejecterId>/<str:rejected_id>", reject_req),
     path('about', about, name='about'),
     path('game', game, name='game'),
     path('search/', search, name = "user search"),
     path('profile_update', profile_update, name='profile_update'),
     path('missions', missions, name='missions'),
-    path("search/<str:idVal>/", addfriend, name='addfriend')
+    path("search/<str:idVal>/", addfriend, name='addfriend'),
+    path('manage_missions/', manage_missions, name='manage_missions'),
 ]
 
 if settings.DEBUG:

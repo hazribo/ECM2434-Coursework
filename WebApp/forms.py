@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Profile
+from .models import *
 
 '''
         <form class="d-flex search-bar" action="{% url 'profile' username='temp_user' %}" method="GET" id="search-form"> 
@@ -47,3 +47,8 @@ class ProfileUpdateForm(forms.ModelForm):
         # Customised help text:
         self.fields['bio'].help_text = 'Write a short bio about yourself.'
         self.fields['profile_picture'].help_text = 'Upload a profile picture.'
+
+class MissionForm(forms.ModelForm):
+    class Meta:
+        model = Mission
+        fields = ['name', 'description', 'points']
