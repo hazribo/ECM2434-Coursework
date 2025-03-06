@@ -20,3 +20,6 @@ env/
 
 # OS
 .DS_Store
+
+# Misc
+.bat
