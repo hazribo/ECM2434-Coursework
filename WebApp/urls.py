@@ -18,7 +18,8 @@ urlpatterns = [
     path('search/', search, name = "user search"),
     path('profile_update', profile_update, name='profile_update'),
     path('missions', missions, name='missions'),
-    path("search/<str:idVal>/", addfriend, name='addfriend')
+    path("search/<str:idVal>/", addfriend, name='addfriend'),
+    path('manage_missions/', manage_missions, name='manage_missions'),
 ]
 
 if settings.DEBUG:

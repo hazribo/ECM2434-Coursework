@@ -1,17 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
-from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import call_command
-from .models import User, Profile, Mission, UserMission
-from .forms import UserRegistrationForm, ProfileUpdateForm
+from .models import *
+from .forms import *
 
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
 from .friendsystem_src import record_friend_request_response, send_friend_request, get_friend_request_list, get_friend_list
-
 
 # Friend system code:
 _IGNORE_PASSWORD_REQS = True
@@ -29,6 +28,45 @@ def accept_req(request, accepter_id, accepted_id, **kwargs):
 def reject_req(request, rejecter_id, rejected_id, **kwargs):
     record_friend_request_response(rejecter_id, rejected_id, False)
     return unchanged(request)
+
+# Helper functions for user roles/permissions:
+def is_game_keeper_or_developer(user):
+    return user.user_type in ['game_keeper', 'developer']
+def is_developer(user):
+    return user.user_type == 'developer'
+
+# For adding/deleting missions (must be GK or Dev):
+@login_required
+@user_passes_test(is_game_keeper_or_developer)
+def manage_missions(request):
+    missions = Mission.objects.all()
+
+    if request.method == "POST":
+        # Handles adding or editing existing missions:
+        mission_id = request.POST.get('mission_id')  # Get mission ID if editing
+        if mission_id: # Editing existing mission:
+            mission = get_object_or_404(Mission, id=mission_id)
+            form = MissionForm(request.POST, instance=mission)
+        else:  # Adding ew mission:
+            form = MissionForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect('manage_missions')
+    else:
+        form = MissionForm()
+
+    if request.method == "POST" and 'delete_mission_id' in request.POST:
+        # Handles deleting missions:
+        mission_id = request.POST['delete_mission_id']
+        mission = get_object_or_404(Mission, id=mission_id)
+        mission.delete()
+        return HttpResponseRedirect(request.path)
+
+    return render(request, 'WebApp/manage_missions.html', {
+        'missions': missions,
+        'form': form,
+    })
 
 
 def home(request):
@@ -194,9 +232,6 @@ def missions(request):
         'user_missions': user_missions,
     }
     return render(request, 'WebApp/missions.html', context)
-
-def is_developer(user):
-    return user.user_type == 'developer'
 
 @user_passes_test(is_developer)
 def developer_dashboard(request):

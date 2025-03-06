@@ -24,6 +24,13 @@
             </li>
         {% endfor %}
     </ul>
+
+    <!-- Display "Manage Missions" Button if the user is a Game Keeper or Developer -->
+    {% if user.user_type == 'game_keeper' or user.user_type == 'developer' %}
+        <div class="manage-missions-button">
+            <a href="{% url 'manage_missions' %}" class="btn btn-secondary">Manage Missions</a>
+        </div>
+    {% endif %}
 </div>
 
 <!-- Include jQuery -->
