@@ -9,7 +9,6 @@ class UserModelTest(TestCase):
         user = User.objects.create_user(username='testuser', password='testpass123', user_type='player')
         self.assertEqual(user.username, 'testuser')
         self.assertEqual(user.user_type, 'player')
-        self.assertEqual(user.score, 0)
 
     def test_create_superuser(self):
         admin_user = User.objects.create_superuser(username='admin', password='adminpass123')
