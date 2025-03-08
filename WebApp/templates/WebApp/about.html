@@ -4,39 +4,57 @@
 <html lang="en">
     {% block content %}
     <div class="container main-content">
-        <h1 style="color:Limegreen; font-family:Tahoma; text-align: center;"><b>About</b></h1>
-        <p class="lead"; style="color:Limegreen; font-size:160%;"><b>About Our Project</b></p>
-        <p style="text-align: center;">
-            We were tasked with creating a web page using the Django system and while following the Kanban methodology that
-            would encourage sustainability efforts on campus at the University of Exeter. We initially brainstormed many 
-            ideas for how we could ue gamification principles to make an engaging web page that would be fun and keep users
-            coming back. We ultimately decided on using a pet based challenge system, where users complete challenges to 
-            feed and "level up" their pet. We decided upon this as we felt that it would be rewarding for users to see their
-            pet grow and would easily allow for collaboration between users as they could compare pets. We also felt that 
-            customization of pets could be locked behind completing challenges which provides further incentivization and
-            want to compare with users. In line with the eco friendly emphasis of the project and the idea of your pet "growing"
-            we decided on a green bean themed pet. 
-        </p>
-        <div style="text-align: center;">
-            <img src="{% static 'beanpet1.png' %}" alt="Pet Image" />
+        <h1 class="text-center text-white bg-success rounded p-3">About</h1>
+        
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">About Our Project</h2>
+            <p>
+                We were tasked with creating a web page using the Django system and following the Kanban methodology 
+                to encourage sustainability efforts on campus at the University of Exeter. We initially brainstormed many 
+                ideas for how we could use gamification principles to create an engaging web page that would be fun and keep users 
+                coming back. 
+            </p>
+            <p>
+                We ultimately decided on using a pet-based challenge system, where users complete challenges to 
+                feed and "level up" their pet. This approach allows users to feel rewarded as they watch their 
+                pet grow and fosters collaboration as they compare pets. Customization of pets is tied to 
+                completing challenges, providing further motivation.
+            </p>
+            <p>
+                In line with the eco-friendly theme and the concept of a pet "growing," we chose a green bean 
+                themed pet.
+            </p>
         </div>
-        <p style="text-align: center;">What we wanted to encourage:</p>
-        <p style="text-align: center;">- Recycling on campus</p>
-        <p style="text-align: center;">- Walking / Cycling over oter methods of travel</p>
-        <p style="text-align: center;">- Using reusables instead of buying e.g. water bottles</p>
-        <p style="text-align: center;">- Reducing carbon footprint at home e.g. food, lights</p>
-        <p style="text-align: center;">- Visiting campus locations e.g. sustainable garden</p>
-        <p style="text-align: center;">- Collaboration between users for challenges</p>
-        <p class="lead"; style="color:Limegreen; font-size:160%;"><b>About Us</b></p>
-        <p style="text-align: center;">Developed By:
-            - Artur Mialik
-            - Chun Ming Leung
-            - Ciaran Scott
-            - Etienne Benfeghoul
-            - Harry Gardner
-            - Jack Field
-            - Lamri Abdellaoui
-        </p>
+        
+        <div class="text-center mb-4">
+            <img src="{% static 'beanpet1.png' %}" alt="Pet Image" class="img-fluid rounded shadow" />
+        </div>
+        
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">What We Wanted to Encourage:</h2>
+            <ul class="list-unstyled text-center">
+                <li>♻️ Recycling on campus!</li>
+                <li>🚶‍♂️ Walking or cycling over other methods of travel!</li>
+                <li>🛍️ Using reusables instead of single-use products!</li>
+                <li>💡 Reducing carbon footprint at home (e.g., food, lights)!</li>
+                <li>🏡 Visiting campus locations (e.g., sustainable gardens)!</li>
+                <li>🤝 Collaboration between users for eco challenges!</li>
+            </ul>
+        </div>
+        
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">About Us</h2>
+            <p class="text-center">Developed By:</p>
+            <ul class="list-unstyled text-center">
+                <li>Artur Mialik</li>
+                <li>Chun Ming Leung</li>
+                <li>Ciaran Scott</li>
+                <li>Etienne Benfeghoul</li>
+                <li>Harry Gardner</li>
+                <li>Jack Field</li>
+                <li>Lamri Abdellaoui</li>
+            </ul>
+        </div>
     </div>
     {% endblock %}
-    </html>
+</html>
