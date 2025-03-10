@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ...models import Mission  # Ensure correct app name
+from ...models import Mission
 
 class Command(BaseCommand):
     help = "Generates daily missions"
@@ -16,4 +16,4 @@ class Command(BaseCommand):
                 defaults=mission_data
             )
 
-        self.stdout.write(self.style.SUCCESS("✅ Daily missions generated successfully!"))
+        self.stdout.write(self.style.SUCCESS("Missions generated successfully."))

@@ -74,71 +74,7 @@ def manage_missions(request):
         'form': form,
     })
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.decorators import login_required
-from geopy.distance import geodesic
-import json
-
-# Location verification/saving
-@login_required
-def verify_location(request, mission_id):
-    ACCEPTABLE_DISTANCE = 50  # Acceptable distance in meters
-    mission = get_object_or_404(Mission, id=mission_id)
-
-    # Get or create UserMission
-    user_mission, created = UserMission.objects.get_or_create(user=request.user, mission=mission)
-
-    # If the mission is already completed, return success response
-    if user_mission.completed:
-        return JsonResponse({"status": "success", "requires_location": False, "completed": True})
-
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            latitude = data.get("latitude")
-            longitude = data.get("longitude")
-
-            if latitude is None or longitude is None:
-                return JsonResponse({"status": "error", "message": "Location data is missing."}, status=400)
-
-            try:
-                latitude, longitude = float(latitude), float(longitude)
-            except ValueError:
-                return JsonResponse({"status": "error", "message": "Invalid location coordinates."}, status=400)
-
-            mission_location = (mission.latitude, mission.longitude)
-            user_location = (latitude, longitude)
-            distance = geodesic(mission_location, user_location).meters
-
-            print(f"Mission Location: {mission_location}, User Location: {user_location}, Distance: {distance}")
-
-            if distance <= ACCEPTABLE_DISTANCE:
-                user_mission.completed = True
-                user_mission.save()
-
-                # Update user's score
-                profile = request.user.profile
-                profile.score += mission.points
-                profile.save()
-
-                return JsonResponse({
-                    "status": "success",
-                    "requires_location": True,
-                    "location_verified": True,
-                    "distance": distance
-                })
-            else:
-                return JsonResponse({
-                    "status": "success",
-                    "requires_location": True,
-                    "location_verified": False,
-                    "distance": distance
-                })
-        except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON format."}, status=400)  
-    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
-
+# Mission management:
 @login_required
 def missions(request):
     ACCEPTABLE_DISTANCE = 100 # Acceptable distance from mission location - feel free to edit to debug.
@@ -157,7 +93,7 @@ def missions(request):
             mission = get_object_or_404(Mission, id=mission_id)
             user_mission, created = UserMission.objects.get_or_create(user=request.user, mission=mission)
 
-            # If mission requires location verification
+            # Checks if mission is location-based:
             if mission.requires_location:
                 if latitude is None or longitude is None:
                     return JsonResponse({
@@ -174,17 +110,18 @@ def missions(request):
                         "message": "Invalid location coordinates."
                     })
 
-                # Calculate distance
+                # Calculate distance from target location:
                 mission_location = (mission.latitude, mission.longitude)
                 user_location = (latitude, longitude)
                 distance = geodesic(mission_location, user_location).meters
                 print(f"Mission Location: {mission_location}, User Location: {user_location}, Distance: {distance}")
 
-                if distance <= ACCEPTABLE_DISTANCE:  # Acceptable distance in meters
+                if distance <= ACCEPTABLE_DISTANCE:
+                    # As long as in range, mission completed...
                     user_mission.completed = True
                     user_mission.save()
 
-                    # Update user score
+                    # ...and points awarded:
                     profile = request.user.profile
                     profile.score += mission.points
                     profile.save()
@@ -193,7 +130,7 @@ def missions(request):
                         "status": "success",
                         "requires_location": True,
                         "location_verified": True,
-                        "distance": 0
+                        "distance": distance
                     })
                 else:
                     return JsonResponse({
@@ -203,12 +140,12 @@ def missions(request):
                         "distance": distance
                     })
 
-            # Handle self-check missions
+            # Handle self-check missions (such as recycling):
             else:
                 user_mission.completed = not user_mission.completed
                 user_mission.save()
 
-                # Update user score
+                # Award points to user on self-submission:
                 profile = request.user.profile
                 if user_mission.completed:
                     profile.score += mission.points
