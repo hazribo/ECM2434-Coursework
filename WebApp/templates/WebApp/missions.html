@@ -54,17 +54,21 @@
                 },
                 success: function(response) {
                     if (response.status === "success") {
-                        // Update text/status:
-                        if (response.completed) {
-                            button.text("Undo");
-                            statusElement.text("Status: Completed");
+                        // If mission requires location, redirect to verify_location:
+                        if (response.requires_location) {
+                            window.location.href = "{% url 'verify_location' %}?mission_id=" + missionId;
                         } else {
-                            button.text("Complete");
-                            statusElement.text("Status: Not Completed");
+                            // Update text/status for self-check missions:
+                            if (response.completed) {
+                                button.text("Undo");
+                                statusElement.text("Status: Completed");
+                            } else {
+                                button.text("Complete");
+                                statusElement.text("Status: Not Completed");
+                            }
                         }
                     }
                 },
-                // Alert on error:
                 error: function() {
                     alert("An error occurred. Please try again.");
                 }

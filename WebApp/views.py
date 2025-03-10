@@ -138,6 +138,10 @@ def missions(request):
             date_completed=today
         )
 
+        # If the mission requires location, redirect to verify_location page
+        if mission.requires_location and not user_mission.completed:
+            return redirect('verify_location', mission_id=mission.id)
+
         # Toggle completion status for self-check missions
         if not mission.requires_location:
             user_mission.completed = not user_mission.completed
@@ -156,11 +160,6 @@ def missions(request):
                 "completed": user_mission.completed
             })
 
-    # Auto-check long/lat for location-based missions
-    location_mission = Mission.objects.filter(requires_location=True).first()
-    if location_mission:
-        return render(request, 'WebApp/verify_location.html', {'mission': location_mission})
-
     # Ensure all missions are tracked in UserMission:
     all_missions = Mission.objects.all()
     user_missions = UserMission.objects.filter(user=request.user, date_completed=today)
@@ -173,6 +172,47 @@ def missions(request):
         'user_missions': user_missions,
         'status': request.GET.get('status'),
     })
+
+@login_required
+def verify_location(request, mission_id):
+    mission = get_object_or_404(Mission, id=mission_id)
+
+    # Get or create UserMission
+    user_mission, created = UserMission.objects.get_or_create(
+        user=request.user,
+        mission=mission,
+        date_completed=request.user.profile.date_completed
+    )
+
+    # If the mission has already been completed, redirect back to the missions page
+    if user_mission.completed:
+        return redirect('missions')
+
+    # Handle location verification logic:
+    if request.method == "POST":
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
+
+        # Validate the location (for simplicity, just check if the latitude and longitude match the mission's set values)
+        if float(latitude) == mission.latitude and float(longitude) == mission.longitude:
+            # Mark the mission as completed after successful location verification
+            user_mission.completed = True
+            user_mission.save()
+
+            # Update the user's score
+            profile = request.user.profile
+            profile.score += mission.points
+            profile.save()
+
+            return redirect('missions')  # Redirect to the missions page after successful verification
+
+        # If location does not match, provide an error message
+        return render(request, 'WebApp/verify_location.html', {
+            'mission': mission,
+            'error': "Location does not match. Please try again."
+        })
+
+    return render(request, 'WebApp/verify_location.html', {'mission': mission})
 
 def home(request):
     return render(request, 'WebApp/home.html')
