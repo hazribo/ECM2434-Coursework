@@ -126,7 +126,7 @@ def verify_location(request, mission_id):
                     "status": "success",
                     "requires_location": True,
                     "location_verified": True,
-                    "distance": 0
+                    "distance": distance
                 })
             else:
                 return JsonResponse({
