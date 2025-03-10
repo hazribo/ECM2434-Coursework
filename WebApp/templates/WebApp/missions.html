@@ -12,13 +12,25 @@
                 <p>Points: {{ mission.points }}</p>
                 {% for user_mission in user_missions %}
                     {% if user_mission.mission == mission %}
-                        <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
-                        <form class="complete-mission-form" data-mission-id="{{ mission.id }}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">
-                                {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
-                            </button>
-                        </form>
+                        {% if mission.latitude and mission.longitude %}
+                            <!-- Mission with location -->
+                            <p class="mission-status">Status: {% if user_mission.completed %}Completed.{% else %}Location to be verified.{% endif %}</p>
+                            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">
+                                    {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
+                                </button>
+                            </form>
+                        {% else %}
+                            <!-- Mission without location -->
+                            <p class="mission-status">Status: {% if user_mission.completed %}Completed.{% else %}Not Completed.{% endif %}</p>
+                            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">
+                                    {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
+                                </button>
+                            </form>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </li>
@@ -36,29 +48,71 @@
 <!-- Include jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $(".complete-mission-form").submit(function(event) {
-            event.preventDefault(); 
+    $(document).ready(function () {
+        $(".complete-mission-form").submit(function (event) {
+            event.preventDefault();
 
             var form = $(this);
             var missionId = form.data("mission-id");
+            var latitude = form.data("latitude");
+            var longitude = form.data("longitude");
             var button = form.find("button");
             var statusElement = form.siblings(".mission-status");
 
+            console.log("Mission ID:", missionId);
+            console.log("Mission Latitude:", latitude);
+            console.log("Mission Longitude:", longitude);
+
+            // If mission requires location, get user location
+            if (latitude && longitude) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        const userLatitude = position.coords.latitude;
+                        const userLongitude = position.coords.longitude;
+
+                        console.log("User Latitude:", userLatitude);
+                        console.log("User Longitude:", userLongitude);
+
+                        // Send AJAX request with user location
+                        verifyMissionLocation(missionId, userLatitude, userLongitude, form, button, statusElement);
+                    }, function (error) {
+                        alert("Unable to retrieve your location: " + error.message);
+                    });
+                } else {
+                    alert("Geolocation is not supported by your browser.");
+                }
+            } else {
+                // For missions that don't require location
+                verifyMissionLocation(missionId, null, null, form, button, statusElement);
+            }
+        });
+
+        function verifyMissionLocation(missionId, userLatitude, userLongitude, form, button, statusElement) {
             $.ajax({
-                url: "{% url 'missions' %}", 
+                url: "{% url 'missions' %}", // Send request to /missions/ endpoint
                 type: "POST",
-                data: {
-                    mission_id: missionId,
-                    csrfmiddlewaretoken: form.find("input[name='csrfmiddlewaretoken']").val()
+                contentType: "application/json",
+                headers: {
+                    "X-CSRFToken": form.find("input[name='csrfmiddlewaretoken']").val()
                 },
-                success: function(response) {
+                data: JSON.stringify({
+                    mission_id: missionId,
+                    latitude: userLatitude,
+                    longitude: userLongitude
+                }),
+                success: function (response) {
+                    console.log("Server Response:", response);
                     if (response.status === "success") {
-                        // If mission requires location, redirect to verify_location:
                         if (response.requires_location) {
-                            window.location.href = "{% url 'verify_location' %}?mission_id=" + missionId;
+                            if (response.location_verified) {
+                                alert("Location verified! Mission completed.");
+                                button.text("Verified");
+                                statusElement.text("Status: Verified");
+                            } else {
+                                alert("You are too far from the mission location. Distance: " + response.distance + " meters.");
+                            }
                         } else {
-                            // Update text/status for self-check missions:
+                            // Handle self-check missions
                             if (response.completed) {
                                 button.text("Undo");
                                 statusElement.text("Status: Completed");
@@ -67,13 +121,17 @@
                                 statusElement.text("Status: Not Completed");
                             }
                         }
+                    } else {
+                        alert(response.message || "An error occurred.");
                     }
                 },
-                error: function() {
-                    alert("An error occurred. Please try again.");
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                    console.log("Response Text:", xhr.responseText);
+                    alert("An error occurred while verifying location.");
                 }
             });
-        });
+        }
     });
 </script>
 {% endblock %}

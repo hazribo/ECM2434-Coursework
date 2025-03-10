@@ -13,7 +13,10 @@ from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
 from .friendsystem_src import *
 from .missions_src import get_user_missions
+# geopy for location views:
 from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 
 # Friend system code:
 _IGNORE_PASSWORD_REQS = True
@@ -71,148 +74,171 @@ def manage_missions(request):
         'form': form,
     })
 
-# Location verification/saving:
-ACCEPTABLE_DISTANCE = 50  # Allowed distance from mission location (can change to debug).
-@csrf_exempt
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.decorators import login_required
+from geopy.distance import geodesic
+import json
+
+# Location verification/saving
 @login_required
-def verify_location(request):
-    if request.method == 'POST':
+def verify_location(request, mission_id):
+    ACCEPTABLE_DISTANCE = 50  # Acceptable distance in meters
+    mission = get_object_or_404(Mission, id=mission_id)
+
+    # Get or create UserMission
+    user_mission, created = UserMission.objects.get_or_create(user=request.user, mission=mission)
+
+    # If the mission is already completed, return success response
+    if user_mission.completed:
+        return JsonResponse({"status": "success", "requires_location": False, "completed": True})
+
+    if request.method == "POST":
         try:
             data = json.loads(request.body)
-            mission_id = data.get('mission_id')
-            user_lat = data.get('latitude')
-            user_long = data.get('longitude')
+            latitude = data.get("latitude")
+            longitude = data.get("longitude")
 
-            mission = Mission.objects.get(id=mission_id)
-            today = timezone.now().date()
+            if latitude is None or longitude is None:
+                return JsonResponse({"status": "error", "message": "Location data is missing."}, status=400)
 
-            # Get or create the UserMission
-            user_mission, _ = UserMission.objects.get_or_create(
-                user=request.user,
-                mission=mission,
-                date_completed=today
-            )
+            try:
+                latitude, longitude = float(latitude), float(longitude)
+            except ValueError:
+                return JsonResponse({"status": "error", "message": "Invalid location coordinates."}, status=400)
 
-            # If the mission does not require location verification:
-            if not mission.requires_location:
-                return redirect('/missions/')
-
-            # If location is required but missing:
-            if user_lat is None or user_long is None:
-                return redirect('/missions/?status=location_failed')
-
-            # Check if the user is within acceptable range
             mission_location = (mission.latitude, mission.longitude)
-            user_location = (float(user_lat), float(user_long))
+            user_location = (latitude, longitude)
             distance = geodesic(mission_location, user_location).meters
+
+            print(f"Mission Location: {mission_location}, User Location: {user_location}, Distance: {distance}")
 
             if distance <= ACCEPTABLE_DISTANCE:
                 user_mission.completed = True
                 user_mission.save()
-                return redirect('/missions/?status=location_verified')
+
+                # Update user's score
+                profile = request.user.profile
+                profile.score += mission.points
+                profile.save()
+
+                return JsonResponse({
+                    "status": "success",
+                    "requires_location": True,
+                    "location_verified": True,
+                    "distance": 0
+                })
             else:
-                return redirect(f'/missions/?status=too_far&distance={int(distance)}')
-
-        except Exception as e:
-            return redirect(f'/missions/?status=error&message={e}')
-
-    return redirect('/missions/?status=invalid_request')
+                return JsonResponse({
+                    "status": "success",
+                    "requires_location": True,
+                    "location_verified": False,
+                    "distance": distance
+                })
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON format."}, status=400)  
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
 
 @login_required
 def missions(request):
-    today = timezone.now().date()
-
+    ACCEPTABLE_DISTANCE = 100 # Acceptable distance from mission location - feel free to edit to debug.
     # Generate default missions if none exist:
     if not Mission.objects.exists():
         call_command('generate_missions')
 
     # Handle POST request (on mission completion):
     if request.method == "POST":
-        mission_id = request.POST.get("mission_id")
-        mission = get_object_or_404(Mission, id=mission_id)
+        try:
+            data = json.loads(request.body)
+            mission_id = data.get("mission_id")
+            latitude = data.get("latitude")
+            longitude = data.get("longitude")
 
-        # Get or create UserMission:
-        user_mission, created = UserMission.objects.get_or_create(
-            user=request.user,
-            mission=mission,
-            date_completed=today
-        )
+            mission = get_object_or_404(Mission, id=mission_id)
+            user_mission, created = UserMission.objects.get_or_create(user=request.user, mission=mission)
 
-        # If the mission requires location, redirect to verify_location page
-        if mission.requires_location and not user_mission.completed:
-            return redirect('verify_location', mission_id=mission.id)
+            # If mission requires location verification
+            if mission.requires_location:
+                if latitude is None or longitude is None:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Location data is missing."
+                    })
 
-        # Toggle completion status for self-check missions
-        if not mission.requires_location:
-            user_mission.completed = not user_mission.completed
-            user_mission.save()
+                try:
+                    latitude = float(latitude)
+                    longitude = float(longitude)
+                except ValueError:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Invalid location coordinates."
+                    })
 
-            # Update user score
-            profile = request.user.profile
-            if user_mission.completed:
-                profile.score += mission.points
+                # Calculate distance
+                mission_location = (mission.latitude, mission.longitude)
+                user_location = (latitude, longitude)
+                distance = geodesic(mission_location, user_location).meters
+                print(f"Mission Location: {mission_location}, User Location: {user_location}, Distance: {distance}")
+
+                if distance <= ACCEPTABLE_DISTANCE:  # Acceptable distance in meters
+                    user_mission.completed = True
+                    user_mission.save()
+
+                    # Update user score
+                    profile = request.user.profile
+                    profile.score += mission.points
+                    profile.save()
+
+                    return JsonResponse({
+                        "status": "success",
+                        "requires_location": True,
+                        "location_verified": True,
+                        "distance": 0
+                    })
+                else:
+                    return JsonResponse({
+                        "status": "success",
+                        "requires_location": True,
+                        "location_verified": False,
+                        "distance": distance
+                    })
+
+            # Handle self-check missions
             else:
-                profile.score -= mission.points
-            profile.save()
+                user_mission.completed = not user_mission.completed
+                user_mission.save()
 
+                # Update user score
+                profile = request.user.profile
+                if user_mission.completed:
+                    profile.score += mission.points
+                else:
+                    profile.score -= mission.points
+                profile.save()
+
+                return JsonResponse({
+                    "status": "success",
+                    "requires_location": False,
+                    "completed": user_mission.completed
+                })
+
+        except json.JSONDecodeError:
             return JsonResponse({
-                "status": "success",
-                "completed": user_mission.completed
+                "status": "error",
+                "message": "Invalid JSON format."
             })
 
     # Ensure all missions are tracked in UserMission:
     all_missions = Mission.objects.all()
-    user_missions = UserMission.objects.filter(user=request.user, date_completed=today)
+    user_missions = UserMission.objects.filter(user=request.user)
 
     for mission in all_missions:
-        UserMission.objects.get_or_create(user=request.user, mission=mission, date_completed=today)
+        UserMission.objects.get_or_create(user=request.user, mission=mission)
 
     return render(request, 'WebApp/missions.html', {
         'missions': all_missions,
-        'user_missions': user_missions,
-        'status': request.GET.get('status'),
+        'user_missions': user_missions
     })
-
-@login_required
-def verify_location(request, mission_id):
-    mission = get_object_or_404(Mission, id=mission_id)
-
-    # Get or create UserMission
-    user_mission, created = UserMission.objects.get_or_create(
-        user=request.user,
-        mission=mission,
-        date_completed=request.user.profile.date_completed
-    )
-
-    # If the mission has already been completed, redirect back to the missions page
-    if user_mission.completed:
-        return redirect('missions')
-
-    # Handle location verification logic:
-    if request.method == "POST":
-        latitude = request.POST.get("latitude")
-        longitude = request.POST.get("longitude")
-
-        # Validate the location (for simplicity, just check if the latitude and longitude match the mission's set values)
-        if float(latitude) == mission.latitude and float(longitude) == mission.longitude:
-            # Mark the mission as completed after successful location verification
-            user_mission.completed = True
-            user_mission.save()
-
-            # Update the user's score
-            profile = request.user.profile
-            profile.score += mission.points
-            profile.save()
-
-            return redirect('missions')  # Redirect to the missions page after successful verification
-
-        # If location does not match, provide an error message
-        return render(request, 'WebApp/verify_location.html', {
-            'mission': mission,
-            'error': "Location does not match. Please try again."
-        })
-
-    return render(request, 'WebApp/verify_location.html', {'mission': mission})
 
 def home(request):
     return render(request, 'WebApp/home.html')
