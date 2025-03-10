@@ -2,31 +2,32 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-    <h1>Daily Missions</h1>
-    <ul class="missions-list">
+<div class="container main-content">
+    <h1 class="text-center text-white bg-success rounded p-4 mb-4">Daily Missions</h1>
+    <ul class="list-unstyled">
         {% for mission in missions %}
-            <li class="mission-item">
-                <h3>{{ mission.name }}</h3>
-                <p>{{ mission.description }}</p>
-                <p>Points: {{ mission.points }}</p>
+            <li class="mission-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+                <h3 class="text-success">{{ mission.name }}</h3>
+                <p class="lead">{{ mission.description }}</p>
+                <p><strong>Points:</strong> {{ mission.points }}</p>
+
                 {% for user_mission in user_missions %}
                     {% if user_mission.mission == mission %}
                         {% if mission.latitude and mission.longitude %}
                             <!-- Mission with location -->
-                            <p class="mission-status">Status: {% if user_mission.completed %}Completed.{% else %}Location to be verified.{% endif %}</p>
+                            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
                             <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary w-100">
                                     {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
                                 </button>
                             </form>
                         {% else %}
                             <!-- Mission without location -->
-                            <p class="mission-status">Status: {% if user_mission.completed %}Completed.{% else %}Not Completed.{% endif %}</p>
+                            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
                             <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-success w-100">
                                     {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
                                 </button>
                             </form>
@@ -39,8 +40,8 @@
 
     <!-- Display "Manage Missions" Button if the user is a Game Keeper or Developer -->
     {% if user.user_type == 'game_keeper' or user.user_type == 'developer' %}
-        <div class="manage-missions-button">
-            <a href="{% url 'manage_missions' %}" class="btn btn-secondary">Manage Missions</a>
+        <div class="text-center">
+            <a href="{% url 'manage_missions' %}" class="btn btn-secondary btn-lg">Manage Missions</a>
         </div>
     {% endif %}
 </div>
@@ -59,19 +60,12 @@
             var button = form.find("button");
             var statusElement = form.siblings(".mission-status");
 
-            console.log("Mission ID:", missionId);
-            console.log("Mission Latitude:", latitude);
-            console.log("Mission Longitude:", longitude);
-
             // If mission requires location, get user location
             if (latitude && longitude) {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function (position) {
                         const userLatitude = position.coords.latitude;
                         const userLongitude = position.coords.longitude;
-
-                        console.log("User Latitude:", userLatitude);
-                        console.log("User Longitude:", userLongitude);
 
                         // Send AJAX request with user location
                         verifyMissionLocation(missionId, userLatitude, userLongitude, form, button, statusElement);
@@ -101,7 +95,6 @@
                     longitude: userLongitude
                 }),
                 success: function (response) {
-                    console.log("Server Response:", response);
                     if (response.status === "success") {
                         if (response.requires_location) {
                             if (response.location_verified) {
@@ -127,7 +120,6 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("Error:", error);
-                    console.log("Response Text:", xhr.responseText);
                     alert("An error occurred while verifying location.");
                 }
             });
