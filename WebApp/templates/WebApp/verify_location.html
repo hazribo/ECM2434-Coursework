@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- No display/UI needed; auto-verification page for location-based mission data -->
+<html lang="en">
+<head>
+    <title>Verifying Location...</title>
+</head>
+<body>
+    <script>
+        const missionId = "{{ mission.id }}";
+
+        function sendLocation(lat, lng) {
+            fetch('/verify-location/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    mission_id: missionId,
+                    latitude: lat,
+                    longitude: lng
+                })
+            })
+            .then(response => {
+                window.location.href = "/missions/";
+            })
+            .catch(error => {
+                window.location.href = "/missions/?status=error";
+            });
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => sendLocation(position.coords.latitude, position.coords.longitude),
+                () => window.location.href = "/missions/?status=location_failed"
+            );
+        } else {
+            window.location.href = "/missions/?status=no_geolocation";
+        }
+    </script>
+</body>
+</html>

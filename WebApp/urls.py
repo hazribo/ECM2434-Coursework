@@ -20,6 +20,7 @@ urlpatterns = [
     path('missions', missions, name='missions'),
     path("search/<str:idVal>/", addfriend, name='addfriend'),
     path('manage_missions/', manage_missions, name='manage_missions'),
+    path('verify-location/', verify_location, name='verify_location'),
 ]
 
 if settings.DEBUG:

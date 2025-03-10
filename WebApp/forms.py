@@ -51,4 +51,4 @@ class ProfileUpdateForm(forms.ModelForm):
 class MissionForm(forms.ModelForm):
     class Meta:
         model = Mission
-        fields = ['name', 'description', 'points']
+        fields = ['name', 'description', 'points', 'requires_location', 'latitude', 'longitude']

@@ -39,6 +39,9 @@ class Mission(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     points = models.IntegerField(default=10)
+    requires_location = models.BooleanField(default=False)  # To differentiate between location/honour-system missions
+    latitude = models.FloatField(null=True, blank=True)     # Holds location data (v)
+    longitude = models.FloatField(null=True, blank=True)    # for location missions.
 
     def __str__(self):
         return self.name

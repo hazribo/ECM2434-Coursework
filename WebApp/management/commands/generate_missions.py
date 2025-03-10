@@ -8,7 +8,6 @@ class Command(BaseCommand):
         missions = [
             {"name": "Recycle!", "description": "Use one of the many recycling bins on our campus."},
             {"name": "Visit [Location]!", "description": "Scan the QR Code at [Location]."},
-            {"name": "Visit [Location]!", "description": "Scan the QR Code at [Location]."},
         ]
 
         for mission_data in missions:

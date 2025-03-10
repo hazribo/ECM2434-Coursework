@@ -1,17 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import call_command
+import json
 from .models import *
 from .forms import *
-
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
-from .friendsystem_src import record_friend_request_response, send_friend_request, get_friend_request_list, get_friend_list
+from .friendsystem_src import *
 from .missions_src import get_user_missions
+from geopy.distance import geodesic
 
 # Friend system code:
 _IGNORE_PASSWORD_REQS = True
@@ -69,6 +71,108 @@ def manage_missions(request):
         'form': form,
     })
 
+# Location verification/saving:
+ACCEPTABLE_DISTANCE = 50  # Allowed distance from mission location (can change to debug).
+@csrf_exempt
+@login_required
+def verify_location(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            mission_id = data.get('mission_id')
+            user_lat = data.get('latitude')
+            user_long = data.get('longitude')
+
+            mission = Mission.objects.get(id=mission_id)
+            today = timezone.now().date()
+
+            # Get or create the UserMission
+            user_mission, _ = UserMission.objects.get_or_create(
+                user=request.user,
+                mission=mission,
+                date_completed=today
+            )
+
+            # If the mission does not require location verification:
+            if not mission.requires_location:
+                return redirect('/missions/')
+
+            # If location is required but missing:
+            if user_lat is None or user_long is None:
+                return redirect('/missions/?status=location_failed')
+
+            # Check if the user is within acceptable range
+            mission_location = (mission.latitude, mission.longitude)
+            user_location = (float(user_lat), float(user_long))
+            distance = geodesic(mission_location, user_location).meters
+
+            if distance <= ACCEPTABLE_DISTANCE:
+                user_mission.completed = True
+                user_mission.save()
+                return redirect('/missions/?status=location_verified')
+            else:
+                return redirect(f'/missions/?status=too_far&distance={int(distance)}')
+
+        except Exception as e:
+            return redirect(f'/missions/?status=error&message={e}')
+
+    return redirect('/missions/?status=invalid_request')
+
+@login_required
+def missions(request):
+    today = timezone.now().date()
+
+    # Generate default missions if none exist:
+    if not Mission.objects.exists():
+        call_command('generate_missions')
+
+    # Handle POST request (on mission completion):
+    if request.method == "POST":
+        mission_id = request.POST.get("mission_id")
+        mission = get_object_or_404(Mission, id=mission_id)
+
+        # Get or create UserMission:
+        user_mission, created = UserMission.objects.get_or_create(
+            user=request.user,
+            mission=mission,
+            date_completed=today
+        )
+
+        # Toggle completion status for self-check missions
+        if not mission.requires_location:
+            user_mission.completed = not user_mission.completed
+            user_mission.save()
+
+            # Update user score
+            profile = request.user.profile
+            if user_mission.completed:
+                profile.score += mission.points
+            else:
+                profile.score -= mission.points
+            profile.save()
+
+            return JsonResponse({
+                "status": "success",
+                "completed": user_mission.completed
+            })
+
+    # Auto-check long/lat for location-based missions
+    location_mission = Mission.objects.filter(requires_location=True).first()
+    if location_mission:
+        return render(request, 'WebApp/verify_location.html', {'mission': location_mission})
+
+    # Ensure all missions are tracked in UserMission:
+    all_missions = Mission.objects.all()
+    user_missions = UserMission.objects.filter(user=request.user, date_completed=today)
+
+    for mission in all_missions:
+        UserMission.objects.get_or_create(user=request.user, mission=mission, date_completed=today)
+
+    return render(request, 'WebApp/missions.html', {
+        'missions': all_missions,
+        'user_missions': user_missions,
+        'status': request.GET.get('status'),
+    })
 
 def home(request):
     return render(request, 'WebApp/home.html')
@@ -96,15 +200,9 @@ def game(request):
     return render(request, 'WebApp/game.html', context)
 
 @login_required
-def missions(request):
-    return render(request, 'WebApp/missions.html')
-
-@login_required
 def addfriend(request, idVal = None):
     send_friend_request(request.user.id, idVal)
     return unchanged(request);
-
-
 
 def search(request):
     username = request.GET.get('username', _NoSearchString)
@@ -196,58 +294,6 @@ def redirect_to_profile(request):
     else:
         # redirect to login if not logged in - no profile to show:
         return redirect('login')
-
-# For missions:
-@login_required
-def missions(request):
-    # Check if missions exist; if not, generate them:
-    if not Mission.objects.exists():
-        call_command('generate_missions')  # Run the generate_missions.py script (in WebApp/management/commands/)
-
-    if request.method == "POST":
-        mission_id = request.POST.get("mission_id")
-        mission = Mission.objects.get(id=mission_id)
-        today = timezone.now().date()
-
-        # Get UserMission instance:
-        user_mission, created = UserMission.objects.get_or_create(
-            user=request.user,
-            mission=mission,
-            date_completed=today
-        )
-
-        # Toggle completion status:
-        user_mission.completed = not user_mission.completed
-        user_mission.save()
-
-        # Award (and deduct, debug option) points:
-        profile = request.user.profile
-        if user_mission.completed:
-            profile.score += mission.points
-        else:
-            profile.score -= mission.points
-        profile.save()
-
-        # JSON response:
-        return JsonResponse({
-            "status": "success",
-            "completed": user_mission.completed
-        })
-
-    # Handle GET request (display missions):
-    today = timezone.now().date()
-    missions = Mission.objects.all()
-    user_missions = UserMission.objects.filter(user=request.user, date_completed=today)
-
-    # Create UserMission objects for any unstarted missions:
-    for mission in missions:
-        UserMission.objects.get_or_create(user=request.user, mission=mission, date_completed=today)
-
-    context = {
-        'missions': missions,
-        'user_missions': user_missions,
-    }
-    return render(request, 'WebApp/missions.html', context)
 
 @user_passes_test(is_developer)
 def developer_dashboard(request):
