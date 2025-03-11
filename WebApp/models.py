@@ -5,6 +5,9 @@ from django.db import models
 from django.utils.timezone import now, localtime
 from datetime import timedelta
 
+
+# TODO make seperate section for daily / other missions in missions.html
+
 class User(AbstractUser):
     USER_TYPES = (
         ('player', 'Player'),
@@ -83,6 +86,17 @@ class Mission(models.Model):
     latitude = models.FloatField(null=True, blank=True)     # Holds location data (v)
     longitude = models.FloatField(null=True, blank=True)    # for location missions.
 
+    mtypes = (
+        ("one time", "one time"),
+        ("daily", "daily"),
+        ("weekly", "weekly"),
+        ("repar", "repearing at arbitrary intervals")
+    )
+
+    mission_type = models.CharField(choices=mtypes, max_length = 40, default="one time")
+
+    is_repeating = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 
@@ -90,7 +104,9 @@ class UserMission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mission = models.ForeignKey(Mission, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)
-    date_completed = models.DateField(null=True, blank=True)
+    date_completed = \
+        models.PositiveBigIntegerField(default=0)
+        # models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.mission.name}"

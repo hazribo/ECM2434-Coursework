@@ -11,8 +11,10 @@ urlpatterns = [
     path('', home, name='home'),
     path('profile/', redirect_to_profile, name='redirect_to_profile'),
     path('profile/<str:username>/', profile, name='profile'),
-    path("profile/<str:username>/accept/<str:accepterId>/<str:accepted_id>", accept_req),
-    path("profile/<str:username>/reject/<str:rejecterId>/<str:rejected_id>", reject_req),
+
+    path("profile/<str:username>/accept/<str:accepter_id>/<str:accepted_id>", accept_req),
+    path("profile/<str:username>/reject/<str:rejecter_id>/<str:rejected_id>", reject_req),
+
     path('about', about, name='about'),
     path('game', game, name='game'),
     path('search/', search, name = "user search"),

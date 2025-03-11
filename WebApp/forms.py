@@ -51,6 +51,6 @@ class ProfileUpdateForm(forms.ModelForm):
 class MissionForm(forms.ModelForm):
     class Meta:
         model = Mission
-        fields = ['name', 'description', 'points', 'requires_location', 'latitude', 'longitude']
+        fields = ['name', 'description', 'points', 'requires_location', 'latitude', 'longitude', 'mission_type', "is_repeating"]
         # requires_location must be True for location checking to work.
         # latitude and longitude values can be any float length - don't have to be super precise.

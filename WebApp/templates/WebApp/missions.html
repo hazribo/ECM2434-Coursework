@@ -3,46 +3,182 @@
 
 {% block content %}
 <div class="container main-content">
-    <h1 class="text-center text-white bg-success rounded p-4 mb-4">Daily Missions</h1>
+
+
+    <h1 class="text-center text-white bg-success rounded p-4 mb-4">One Time Missionss</h1>
     <ul class="list-unstyled">
         {% for mission in missions %}
-            <li class="mission-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
-                <h3 class="text-success">{{ mission.name }}</h3>
-                <p class="lead">{{ mission.description }}</p>
-                <p><strong>Points:</strong> {{ mission.points }}</p>
+        {% if "one time" == mission.mission_type %}
+        <li class="mission-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h3 class="text-success">{{ mission.name }}</h3>
+            <p class="lead">{{ mission.description }}</p>
+            <p><strong>Points:</strong> {{ mission.points }}</p>
 
-                {% for user_mission in user_missions %}
-                    {% if user_mission.mission == mission %}
-                        {% if mission.latitude and mission.longitude %}
-                            <!-- Mission with location -->
-                            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
-                            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary w-100">
-                                    {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
-                                </button>
-                            </form>
-                        {% else %}
-                            <!-- Mission without location -->
-                            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
-                            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success w-100">
-                                    {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
-                                </button>
-                            </form>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-            </li>
+            {% for user_mission in user_missions %}
+            {% if user_mission.mission == mission %}
+            {% if mission.latitude and mission.longitude %}
+            <!-- Mission with location -->
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary w-100 clickable">
+                    {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
+                </button>
+            </form>
+            {% else %}
+            <!-- Mission without location -->
+            <p>{{mission.mission_type}}</p>
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success clickable w-100">
+                    {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
+                </button>
+            </form>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        </li>
+        {% endif %}
         {% endfor %}
     </ul>
 
+
+
+
+
+
+
+
+    <h1 class="text-center text-white bg-success rounded p-4 mb-4">Daily Missions</h1>
+    <ul class="list-unstyled">
+        {% for mission in missions %}
+        {% if "daily" == mission.mission_type %}
+        <li class="mission-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h3 class="text-success">{{ mission.name }}</h3>
+            <p class="lead">{{ mission.description }}</p>
+            <p><strong>Points:</strong> {{ mission.points }}</p>
+
+            {% for user_mission in user_missions %}
+            {% if user_mission.mission == mission %}
+            {% if mission.latitude and mission.longitude %}
+            <!-- Mission with location -->
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary w-100 clickable">
+                    {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
+                </button>
+            </form>
+            {% else %}
+            <!-- Mission without location -->
+            <p>{{mission.mission_type}}</p>
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success clickable w-100">
+                    {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
+                </button>
+            </form>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+
+
+    <h1 class="text-center text-white bg-success rounded p-4 mb-4">Weekly Missions</h1>
+    <ul class="list-unstyled">
+        {% for mission in missions %}
+        {% if "weekly" == mission.mission_type %}
+        <li class="mission-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h3 class="text-success">{{ mission.name }}</h3>
+            <p class="lead">{{ mission.description }}</p>
+            <p><strong>Points:</strong> {{ mission.points }}</p>
+
+            {% for user_mission in user_missions %}
+            {% if user_mission.mission == mission %}
+            {% if mission.latitude and mission.longitude %}
+            <!-- Mission with location -->
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary w-100 clickable">
+                    {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
+                </button>
+            </form>
+            {% else %}
+            <!-- Mission without location -->
+            <p>{{mission.mission_type}}</p>
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success clickable w-100">
+                    {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
+                </button>
+            </form>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+
+
+    <h1 class="text-center text-white bg-success rounded p-4 mb-4">Monthly Missions</h1>
+    <ul class="list-unstyled">
+        {% for mission in missions %}
+        {% if "monthly" == mission.mission_type %}
+        <li class="mission-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h3 class="text-success">{{ mission.name }}</h3>
+            <p class="lead">{{ mission.description }}</p>
+            <p><strong>Points:</strong> {{ mission.points }}</p>
+
+            {% for user_mission in user_missions %}
+            {% if user_mission.mission == mission %}
+            {% if mission.latitude and mission.longitude %}
+            <!-- Mission with location -->
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary w-100 clickable">
+                    {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
+                </button>
+            </form>
+            {% else %}
+            <!-- Mission without location -->
+            <p>{{mission.mission_type}}</p>
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success clickable w-100">
+                    {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
+                </button>
+            </form>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+
+
+
+
+
+
+
+
+
     <!-- Display "Manage Missions" Button if the user is a Game Keeper or Developer -->
     {% if user.user_type == 'game_keeper' or user.user_type == 'developer' %}
-        <div class="text-center">
-            <a href="{% url 'manage_missions' %}" class="btn btn-secondary btn-lg">Manage Missions</a>
-        </div>
+    <div class="text-center">
+        <a href="{% url 'manage_missions' %}" class="btn btn-secondary btn-lg">Manage Missions</a>
+    </div>
     {% endif %}
 </div>
 
