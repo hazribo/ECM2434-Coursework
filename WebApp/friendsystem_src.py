@@ -13,7 +13,7 @@ def get_data_for_list(item, asker_profile):
 
     # i know this is bad but i dont know how else 
     try:
-        x = item.profile_picture.path
+        _ = item.profile_picture.path
         data.hasPfp = True
         data.pfpUrl = item.profile_picture.url
     except ValueError:
@@ -22,8 +22,10 @@ def get_data_for_list(item, asker_profile):
     data.name = item.user.username
     data.link = f"../../profile/{data.name}"
 
-    data.acceptURL = f'accept/{asker_profile.id}/{item.id}'
-    data.rejectURL = f'reject/{asker_profile.id}/{item.id}'
+    ending = f'/{asker_profile.id}/{item.id}'
+
+    data.acceptURL = 'accept' + ending;
+    data.rejectURL = 'reject' + ending;
 
     return data
 

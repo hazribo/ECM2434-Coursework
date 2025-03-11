@@ -12,11 +12,14 @@ from .forms import *
 from .leaderboard_src import generate_leaderboard_image
 from .search_src import search_for_username
 from .friendsystem_src import *
-from .missions_src import get_user_missions
+from .missions_src import get_user_missions, tick_repeating_missions
 # geopy for location views:
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
+from time import time as getNow
+
+def getTimeNow(): return getNow()
 
 # Friend system code:
 _IGNORE_PASSWORD_REQS = True
@@ -82,6 +85,15 @@ def missions(request):
     if not Mission.objects.exists():
         call_command('generate_missions')
 
+    username=request.user.username
+        
+    # Get data for provided username to display correct profile:
+    user = get_object_or_404(User, username=username)
+    user_profile = get_object_or_404(Profile, user=user)
+
+    tick_repeating_missions(user_profile);
+
+
     # Handle POST request (on mission completion):
     if request.method == "POST":
         try:
@@ -119,6 +131,8 @@ def missions(request):
                 if distance <= ACCEPTABLE_DISTANCE:
                     # As long as in range, mission completed...
                     user_mission.completed = True
+                    if (user_mission.completed):
+                        user_mission.date_completed = getTimeNow();
                     user_mission.save()
 
                     # ...and points awarded:
@@ -143,6 +157,8 @@ def missions(request):
             # Handle self-check missions (such as recycling):
             else:
                 user_mission.completed = not user_mission.completed
+                if (user_mission.completed):
+                    user_mission.date_completed = getTimeNow();
                 user_mission.save()
 
                 # Award points to user on self-submission:

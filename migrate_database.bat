@@ -1,4 +1,4 @@
-python manage.py makemigrations WebApp
-python manage.py migrate
-python show_sql.py
+env\scripts\python.exe manage.py makemigrations WebApp
+env\scripts\python.exe manage.py migrate
+env\scripts\python.exe show_sql.py
 pause

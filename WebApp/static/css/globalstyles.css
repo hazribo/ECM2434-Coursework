@@ -1,0 +1,7 @@
+.clickable:hover {
+    filter: brightness(130%);
+}
+
+.clickable:active {
+    filter: brightness(70%);
+}
