@@ -1,7 +1,9 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from .models import User, Profile
-from .forms import UserRegistrationForm, ProfileUpdateForm
+from django.utils.timezone import now, localtime
+from .models import *
+from .forms import *
+from datetime import timedelta
 
 # TESTS FOR models.py:
 class UserModelTest(TestCase):
@@ -23,6 +25,67 @@ class UserModelTest(TestCase):
         self.assertEqual(profile.score, 0)
         self.assertEqual(profile.bio, '')
         self.assertFalse(profile.profile_picture.name)
+
+
+class UserLoginStreakTest(TestCase):
+    # Generate user for test purposes:
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser2', password='testpass123', user_type='player')
+        self.profile = Profile.objects.get(user=self.user)
+
+    # Streak on account creation must equal 1:
+    def test_initial_login_streak(self):
+        self.user.last_login_date = None
+        self.user.calc_login_streak()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.login_streak, 1)
+
+    # Logging in the next day must increment the streak by 1:
+    def test_consecutive_day_login_increments_streak(self):
+        self.user.last_login_date = localtime(now()).date() - timedelta(days=1)
+        current_streak = self.user.login_streak
+        self.user.save()
+        self.user.calc_login_streak()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.login_streak, current_streak + 1)
+
+    # Logging in non-consecutively should reset streak to 1:
+    def test_non_consecutive_day_resets_streak(self):
+        self.user.last_login_date = localtime(now()).date() - timedelta(days=2)
+        self.user.calc_login_streak()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.login_streak, 1)
+
+    # Multiple logins per day should not increment streak:
+    def test_multiple_logins_dont_increase_streak(self):
+        self.user.last_login_date = localtime(now()).date()
+        initial_streak = self.user.login_streak
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.login_streak, initial_streak)
+
+    # Ensure reward given when 7 day login streak achieved:
+    def test_reward_given_on_seven_day_streak(self):
+        current_score = self.profile.score
+        self.user.last_login_date = localtime(now()).date() - timedelta(days=1)
+        self.user.login_streak = 6
+        self.user.save()
+        self.user.calc_login_streak()
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.score, current_score + 100)
+
+    # Ensure correct reward given:
+    def test_reward_user_adds_score(self):
+        current_score = self.profile.score
+        self.user.reward_user()
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.score, current_score + 100) # PLACEHOLDER REWARD: CHANGE IF REWARD GIVEN CHANGES.
+
+    # Ensure rewarding user resets streak to 0:
+    def test_reward_user_resets_streak(self):
+        self.user.login_streak = 7
+        self.user.reward_user()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.login_streak, 0)
 
 # TESTS FOR forms.py:
 class UserRegistrationFormTest(TestCase):

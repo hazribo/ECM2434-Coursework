@@ -2,7 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import models
-from django.conf import settings
+from django.utils.timezone import now, localtime
+from datetime import timedelta
 
 class User(AbstractUser):
     USER_TYPES = (
@@ -11,6 +12,45 @@ class User(AbstractUser):
         ('developer', 'Developer'),
     )
     user_type = models.CharField(max_length=20, choices=USER_TYPES, default='player')
+
+    # For login streaks:
+    login_streak = models.IntegerField(default=0)
+    last_login_date = models.DateField(null=True, blank=True)
+
+    def calc_login_streak(self):
+        profile, created = Profile.objects.get_or_create(user=self)
+        today = localtime(now()).date()
+
+        # Already logged in today - return as usual.
+        if self.last_login_date == today:
+            #print(f"No streak increase: {self.login_streak}")
+            return
+        
+        # Continue streak if logged in on a consecutive day.
+        elif self.last_login_date == today - timedelta(days=1):
+            self.login_streak += 1
+            # Reward user for logging in for a week straight:
+            if self.login_streak == 7:
+                #print(f"\nReward given. (Streak: {self.login_streak})\n") 
+                self.reward_user()
+                return
+
+        # Reset streak if neither of the above are true.
+        else:
+            self.login_streak = 1
+            #print(f"Streak reset: {self.login_streak}")  
+
+        self.last_login_date = today
+        self.save()
+
+    def reward_user(self):
+        profile, created = Profile.objects.get_or_create(user=self)
+        #print(f"Rewarding user {self.username}, previous score: {profile.score}")
+        profile.score += 100   # Placeholder; should probably assign a badge/other reward.
+        profile.save()
+        self.login_streak = 0
+        #print(f"New score: {profile.score}, streak reset to {self.login_streak}")
+        return
 
 # Code for user Profiles:
 class Profile(models.Model):
