@@ -1,0 +1,131 @@
+{% extends 'WebApp/game_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container main-content">
+    
+    <h1 class="text-center text-white bg-success rounded p-4 mb-4">Your Team</h1>
+
+    <!-- Your Team Section -->
+    <div id="your-team-section" class="bg-primary text-white rounded p-4 mb-4" {% if not user_team %}style="display:none;"{% endif %}>
+        {% if user_team %}
+        <div class="card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h3 class="text-success">{{ user_team.name }}</h3>
+            <p class="lead"><strong>Leader:</strong> {{ user_team.team_leader.username }}</p>
+            <p><strong>Score:</strong> {{ user_team.score }}</p>
+
+            <form method="POST" class="leave-team-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="leave">
+                <button type="submit" class="btn btn-danger w-100 clickable">Leave Team</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Create a Team Section -->
+    {% if not user_team %}
+    <h2 class="text-center text-white bg-success rounded p-3">Create a Team</h2>
+    <div class="card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div class="mb-3">
+                <label class="form-label"><strong>Team Name:</strong></label>
+                <input type="text" name="name" class="form-control" placeholder="Enter team name" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100 clickable">Create Team</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Join a Team Section -->
+    <h2 class="text-center text-white bg-success rounded p-3">Join a Team</h2>
+    <ul class="list-unstyled">
+        {% for team in teams %}
+        {% if team != user_team %}
+        <li class="team-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h3 class="text-success">{{ team.name }}</h3>
+            <p class="lead"><strong>Leader:</strong> {{ team.team_leader.username }}</p>
+            <p><strong>Score:</strong> {{ team.score }}</p>
+            <form class="join-team-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="join">
+                <input type="hidden" name="team_id" value="{{ team.id }}">
+                <button type="submit" class="btn btn-primary w-100 clickable">Join</button>
+            </form>
+        </li>
+        {% endif %}
+        {% empty %}
+        <p class="text-center">No teams available. Create one!</p>
+        {% endfor %}
+    </ul>
+
+</div>
+
+<!-- jQuery & AJAX to handle joining team and moving it to 'Your Team' section -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".join-team-form").submit(function (event) {
+            event.preventDefault();
+
+            var form = $(this);
+            var teamId = form.find("input[name='team_id']").val();
+            var button = form.find("button");
+
+            $.ajax({
+                url: "", // Uses the same URL (teams page)
+                type: "POST",
+                data: {
+                    "csrfmiddlewaretoken": form.find("input[name='csrfmiddlewaretoken']").val(),
+                    "action": "join",
+                    "team_id": teamId
+                },
+                success: function () {
+                    var teamItem = form.closest(".team-item");
+
+                    // Move team to "Your Team" section
+                    $("#your-team-section").show();
+                    $("#your-team-section").html(teamItem); // Move to your team section
+
+                    // Update button text and disable it
+                    button.text("Joined").removeClass("btn-primary").addClass("btn-success").prop("disabled", true);
+
+                    // Hide all other join buttons
+                    $(".join-team-form button").not(button).remove();
+                },
+                error: function () {
+                    alert("An error occurred while joining the team.");
+                }
+            });
+        });
+
+        // Leave team functionality (optional, just in case you want it)
+        $(".leave-team-form").submit(function (event) {
+            event.preventDefault();
+
+            var form = $(this);
+            var button = form.find("button");
+
+            $.ajax({
+                url: "", // Uses the same URL (teams page)
+                type: "POST",
+                data: {
+                    "csrfmiddlewaretoken": form.find("input[name='csrfmiddlewaretoken']").val(),
+                    "action": "leave"
+                },
+                success: function () {
+                    // Hide "Your Team" section if the user leaves
+                    $("#your-team-section").hide();
+                    button.text("Left").prop("disabled", true);
+                },
+                error: function () {
+                    alert("An error occurred while leaving the team.");
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

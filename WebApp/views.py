@@ -295,6 +295,36 @@ def profile(request, username=None):
 
     return render(request, 'WebApp/profile.html', context)
 
+# Code for teams:
+@login_required
+def manage_teams(request):
+    user = request.user
+    teams = Team.objects.all()
+    user_team = user.profile.team if hasattr(user, "profile") else None
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        team_id = request.POST.get("team_id")
+        
+        if action == "create":
+            name = request.POST.get("name")
+            if name:
+                team = Team.objects.create(name=name, team_owner=user)
+                team.add_member(user)
+                return redirect("teams")
+
+        elif action == "join" and team_id:
+            team = get_object_or_404(Team, id=team_id)
+            team.add_member(user)
+            return redirect("teams")
+
+        elif action == "leave" and user_team:
+            user_team.remove_member(user)
+            return redirect("teams")
+
+    return render(request, "WebApp/teams.html", {"teams": teams, "user_team": user_team})
+
+
 @login_required
 def profile_update(request):
     if request.method == 'POST':

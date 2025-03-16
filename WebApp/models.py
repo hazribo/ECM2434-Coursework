@@ -5,9 +5,9 @@ from django.db import models
 from django.utils.timezone import now, localtime
 from datetime import timedelta
 
-
 # TODO make seperate section for daily / other missions in missions.html
 
+# Code for user data:
 class User(AbstractUser):
     USER_TYPES = (
         ('player', 'Player'),
@@ -54,7 +54,34 @@ class User(AbstractUser):
         self.login_streak = 0
         #print(f"New score: {profile.score}, streak reset to {self.login_streak}")
         return
+    
+# Code for teams (user guilds/clans):
+class Team(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    team_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="led_teams")
+    members = models.ManyToManyField(User, related_name="teams", blank=True)
+    score = models.IntegerField(default=0)
 
+    # Invite a member to your team:
+    def add_member(self, user):
+        if user not in self.members.all():
+            self.members.add(user)
+            self.update_team_score()
+
+    # Remove a member from your team:
+    def remove_member(self, user):
+        if user in self.members.all():
+            self.members.remove(user)
+            self.update_team_score()
+
+    # Update the cumulative team score:
+    def update_team_score(self):
+        self.score = sum(member.profile.score for member in self.members.all())
+        self.save()
+
+    def __str__(self):
+        return self.name
+    
 # Code for user Profiles:
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -64,6 +91,8 @@ class Profile(models.Model):
 
     friend_requests = models.ManyToManyField(User, related_name = "friend_requests")
     friend_list = models.ManyToManyField(User, related_name = "friend_list")
+
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name="profiles")
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -110,4 +139,4 @@ class UserMission(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.mission.name}"
-        
+    
