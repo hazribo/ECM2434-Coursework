@@ -1,38 +1,27 @@
 
-from .models import Profile
+from .models import *
 
-# HAS TO BE RUN BEFORE import pyplot
-# or server crashes becuase django tries to run matplot lib gui in non
-# main thread, this line disables renderer which causes issues
-# (renderer) not needed anyway because only image png is needed
-from matplotlib import use as setGraphicsEngine; setGraphicsEngine('Agg')
-import matplotlib.pyplot as plt
-
-__leaderboard_image_path = "WebApp/static/leaderboard.png"
-
-# generate leaderboard image and save to image path to be used by 
-# leaderboard.html, returns path if sucessful else None
-def generate_leaderboard_image():
-
+def get_leaderboard_data(leaderboard_type='users', limit=10):
     try:
-        # get data
-        profiles = Profile.objects.all().order_by('-score')  
-        names = [profile.user.username for profile in profiles]  
-        scores = [profile.score for profile in profiles]  
-        
-        # plot data
-        plt.bar(names, scores)
-        plt.xlabel("Username"); plt.ylabel("Score");
-        plt.title("Leaderboard")
+        if leaderboard_type == 'teams':
+            queryset = Team.objects.order_by('-score')
+        else:
+            queryset = Profile.objects.select_related('user').order_by('-score')
 
-        # save png
-        open(__leaderboard_image_path, "w").close()
-        plt.savefig(__leaderboard_image_path)
-        plt.close()
+        if limit:
+            queryset = queryset[:limit]
 
-        return __leaderboard_image_path
+        top3 = queryset[:3]
+        top_rest = queryset[3:limit] if limit else queryset[3:]
+
+        return {
+            'top3_items': top3,
+            'top_rest_items': top_rest,
+            'leaderboard_type': leaderboard_type,
+            'limit': limit
+        }
 
     except Exception as e:
-        print(e)
+        print(f"Error generating leaderboard: {e}")
         return None
 
