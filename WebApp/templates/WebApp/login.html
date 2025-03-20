@@ -4,29 +4,33 @@
 <html lang="en">
 
 {% block content %}
-    <h2>Login</h2>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-5" style="border-radius: 20px; background-color: #e6f4ea; max-width: 400px; width: 100%;">
+        <h2 class="text-center text-success mb-4">Login</h2>
 
-    {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-            {% for error in form.non_field_errors %}
-                {{ error }}
-            {% endfor %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="form-group mb-4">
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100 mb-3">Login</button>
+        </form>
+        <div class="text-center">
+            <b>Don't have an account?</b> <a href="{% url 'register' %}" class="text-success">Register here</a>
         </div>
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <!-- Username: -->
-        <div class="form-group">
-            <input type="text" name="username" placeholder="Username" required>  
-        </div>
-        <!-- Password: -->
-        <div class="form-group">
-            <input type="password" name="password" placeholder="Password" required>
-        </div>
-        
-        <button type="submit">Login</button>
-    </form>
-    <b>Don't have an account? <a href="{% url 'register' %}">Register here.</a></b>
+    </div>
+</div>
 {% endblock %}
 
 </html>
