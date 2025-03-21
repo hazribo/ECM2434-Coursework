@@ -8,7 +8,7 @@ from django.core.management import call_command
 import json
 from .models import *
 from .forms import *
-from .leaderboard_src import generate_leaderboard_image
+from .leaderboard_src import *
 from .search_src import search_for_username
 from .friendsystem_src import *
 from .missions_src import get_user_missions, tick_repeating_missions
@@ -262,13 +262,14 @@ def user_logout(request):
     return redirect('login')
 
 def leaderboard(request): 
-    if generate_leaderboard_image() is not None:
-        # if fine and no error
-        return render(request, 'WebApp/leaderboard.html')
-    else:
-        # if error, say so and redirect back home
-        print("LEADERBOARD IMAGE GENERATION ERROR")
-        return redirect('home')
+    leaderboard_type = request.GET.get('type', 'users')
+    limit = request.GET.get('range', '10')
+    range_map = {"10": 10, "50": 50, "100": 100, "all": None}
+    limit = range_map.get(limit, 10)
+
+    data = get_leaderboard_data(leaderboard_type, limit)
+
+    return render(request, 'WebApp/leaderboard.html', data)
 
 @login_required
 def profile(request, username=None):

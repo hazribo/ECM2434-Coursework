@@ -1,14 +1,93 @@
 {% extends 'WebApp/game_base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
 {% block content %}
 <div class="container main-content">
-    <h1>works</h1>
-    <p class="lead">also works</p>
-    <p>also also works</p>
-    <img src="{% static 'leaderboard.png' %}">
+    <h1 class="text-center mb-4">Leaderboard</h1>
+
+    <!-- Filters -->
+    <div class="d-flex justify-content-between mb-4">
+        <div>
+            <select id="leaderboard-type" class="form-select">
+                <option value="users" {% if leaderboard_type == 'users' %}selected{% endif %}>Top Users</option>
+                <option value="teams" {% if leaderboard_type == 'teams' %}selected{% endif %}>Top Teams</option>
+            </select>
+        </div>
+        <div>
+            <select id="leaderboard-range" class="form-select">
+                <option value="10" {% if limit == 10 %}selected{% endif %}>Top 10</option>
+                <option value="50" {% if limit == 50 %}selected{% endif %}>Top 50</option>
+                <option value="100" {% if limit == 100 %}selected{% endif %}>Top 100</option>
+                <option value="all" {% if limit == None %}selected{% endif %}>All</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Podium (1st - 3rd place) -->
+    <div class="list-group mb-5">
+        {% for item in top3_items %}
+        <div class="list-group-item d-flex align-items-center justify-content-between 
+            {% if forloop.counter == 1 %}bg-gold-subtle{% elif forloop.counter == 2 %}bg-silver-subtle{% else %}bg-bronze-subtle{% endif %}">
+            <div class="d-flex align-items-center">
+                {% if leaderboard_type == "teams" %}
+                    <img src="{% static 'images/default_team.png' %}" 
+                        alt="{{ item.name }}" 
+                        class="rounded-full w-20 h-20 object-cover me-3">
+                    <div>
+                        <h6 class="mb-0">
+                            {% if forloop.counter == 1 %}1st 🥇{% elif forloop.counter == 2 %}2nd 🥈{% else %}3rd 🥉{% endif %} - {{ item.name }}
+                        </h6>
+                    </div>
+                {% else %}
+                    <img src="{% if item.profile_picture and item.profile_picture.url %}{{ item.profile_picture.url }}{% else %}{% static 'nopfp.png' %}{% endif %}" 
+                        alt="{{ item.user.username }}'s picture" 
+                        class="rounded-full w-20 h-20 object-cover me-3">
+                    <div>
+                        <h6 class="mb-0">
+                            {% if forloop.counter == 1 %}1st 🥇{% elif forloop.counter == 2 %}2nd 🥈{% else %}3rd 🥉{% endif %} - {{ item.user.username }}
+                        </h6>
+                    </div>
+                {% endif %}
+            </div>
+            <span class="fw-bold">{{ item.score }} pts</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Top 4 and beyond -->
+    <div class="list-group mb-5">
+        {% for item in top_rest_items %}
+        <div class="list-group-item d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                {% if leaderboard_type == "teams" %}
+                    <img src="{% static 'images/default_team.png' %}" 
+                        alt="{{ item.name }}" 
+                        class="rounded-full w-12 h-12 object-cover me-3">
+                    <div>
+                        <h6 class="mb-0">{{ item.name }}</h6>
+                    </div>
+                {% else %}
+                    <img src="{% if item.profile_picture and item.profile_picture.url %}{{ item.profile_picture.url }}{% else %}{% static 'nopfp.png' %}{% endif %}" 
+                        alt="{{ item.user.username }}'s picture" 
+                        class="rounded-full w-12 h-12 object-cover me-3">
+                    <div>
+                        <h6 class="mb-0">{{ item.user.username }}</h6>
+                    </div>
+                {% endif %}
+            </div>
+            <span class="fw-bold">{{ item.score }} pts</span>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+
+<script>
+document.getElementById('leaderboard-range').addEventListener('change', function() {
+    window.location.href = `?type=${document.getElementById('leaderboard-type').value}&range=${this.value}`;
+});
+document.getElementById('leaderboard-type').addEventListener('change', function() {
+    window.location.href = `?type=${this.value}&range=${document.getElementById('leaderboard-range').value}`;
+});
+</script>
+
 {% endblock %}
-</html>
