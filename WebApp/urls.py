@@ -23,6 +23,7 @@ urlpatterns = [
     path("search/<str:idVal>/", addfriend, name='addfriend'),
     path('manage_missions/', manage_missions, name='manage_missions'),
     path("teams/", manage_teams, name="teams"),
+    path('save_photo', save_photo, name='save_photo'),
 ]
 
 if settings.DEBUG:

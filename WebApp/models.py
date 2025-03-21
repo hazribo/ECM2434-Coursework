@@ -140,3 +140,13 @@ class UserMission(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.mission.name}"
     
+# For users uploading photos after a location-required mission:
+class MissionPhoto(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    mission = models.ForeignKey(Mission, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='mission_photos/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Photo by {self.profile.user.username} - Mission: {self.mission.name}"
+    

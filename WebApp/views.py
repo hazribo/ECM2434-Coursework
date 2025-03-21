@@ -17,6 +17,11 @@ from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
 from time import time as getNow
+# image for photo saving:
+from PIL import Image
+import base64
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 def getTimeNow(): return getNow()
 
@@ -192,6 +197,48 @@ def missions(request):
         'user_missions': user_missions
     })
 
+@login_required
+def save_photo(request):
+    if request.method == "POST":
+        try:
+            # Parse JSON request body:
+            data = json.loads(request.body)
+            image_data = data.get('image_data')  
+            mission_id = data.get('mission_id')
+
+            if not image_data:
+                return JsonResponse({'status': 'error', 'message': 'No image data received'})
+
+            # Extract the base64 string:
+            format, imgstr = image_data.split(';base64,')
+            imgdata = base64.b64decode(imgstr)
+
+            # Convert image to a file-like object:
+            image_file = ContentFile(imgdata, name=f"{request.user.username}_mission_{mission_id}.jpg")
+
+            # Open image with PIL:
+            image = Image.open(BytesIO(imgdata))
+            image.verify()  # Verifies no corrupted image.
+
+            # Get the user's profile:
+            profile = Profile.objects.get(user=request.user)
+
+            # Get the mission:
+            try:
+                mission = Mission.objects.get(id=mission_id)
+            except Mission.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Invalid mission ID'})
+
+            # Save photo to MissionPhoto model:
+            MissionPhoto.objects.create(profile=profile, mission=mission, image=image_file)
+
+            return JsonResponse({'status': 'success', 'message': 'Photo saved successfully'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
 def home(request):
     return render(request, 'WebApp/home.html')
 
@@ -285,13 +332,18 @@ def profile(request, username=None):
     user = get_object_or_404(User, username=username)
     user_profile = get_object_or_404(Profile, user=user)
 
+    # Get all mission-related photos attached to the requested profile:
+    mission_photos = MissionPhoto.objects.filter(profile=user_profile)
+
+    # Get the friend / friend request list for this profile:
     friend_request_list = get_friend_request_list(user_profile);
     friend_list = get_friend_list(user_profile)
 
     context = {
         'profile': user_profile,
         'req_list' : friend_request_list,
-        'friend_list' : friend_list
+        'friend_list' : friend_list,
+        'mission_photos': mission_photos,
     };
 
     return render(request, 'WebApp/profile.html', context)
