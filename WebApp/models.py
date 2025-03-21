@@ -54,7 +54,19 @@ class User(AbstractUser):
         self.login_streak = 0
         #print(f"New score: {profile.score}, streak reset to {self.login_streak}")
         return
+  
+
+
+# Shop item class
+class ShopItem(models.Model):
+    pass;
+
+    name = models.CharField(max_length = 100, unique = True)
+    cost = models.IntegerField(default=1)
     
+
+
+
 # Code for teams (user guilds/clans):
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -89,10 +101,15 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
+    inventory = models.ManyToManyField(ShopItem)
+    equipped = models.ManyToManyField(ShopItem)
+
     friend_requests = models.ManyToManyField(User, related_name = "friend_requests")
     friend_list = models.ManyToManyField(User, related_name = "friend_list")
 
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name="profiles")
+
+    credits = models.IntegerField(default=10)
 
     def __str__(self):
         return f'{self.user.username} Profile'

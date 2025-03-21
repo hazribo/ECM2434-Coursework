@@ -12,6 +12,7 @@ from .leaderboard_src import *
 from .search_src import search_for_username
 from .friendsystem_src import *
 from .missions_src import get_user_missions, tick_repeating_missions
+from .shop_src import get_shop_items, user_buy, get_inventory_items
 # geopy for location views:
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
@@ -26,8 +27,14 @@ from django.core.files.base import ContentFile
 def getTimeNow(): return getNow()
 
 # Friend system code:
-_IGNORE_PASSWORD_REQS = True
+_IGNORE_PASSWORD_REQS = False
 _NoSearchString = "NONE"
+
+def _get_user_data(request):
+    user = request.user
+    user_profile = get_object_or_404(Profile, user=user)
+
+    return user, user_profile
 
 # returned by view function in order to not change the page
 # active at all
@@ -245,6 +252,36 @@ def home(request):
 def about(request):
     return render(request, 'WebApp/about.html')
 
+
+def alert(request, message):
+    return render(request, "WebApp/alert.html", {"message" : message})
+
+@login_required
+def buy_shop(request, itemname):
+    
+    _, profile = _get_user_data(request)
+
+    if user_buy(profile, itemname):
+        # enough 
+        return unchanged(request)
+    else:
+        # not enough credits
+        return alert(request, "not enough credits");
+    
+
+@login_required
+def shop(request):
+
+    _, profile = _get_user_data(request)
+
+    context = {
+        "shop_items" : get_shop_items(),
+        "player_credits" :  profile.credits,
+        "inventory" : get_inventory_items(profile)
+    }
+    return render(request, "WebApp/shop.html", context)
+
+
 @login_required
 def game(request):
     username=request.user.username
@@ -282,10 +319,12 @@ def search(request):
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
+        print(form.error_messages)
         if form.is_valid() or _IGNORE_PASSWORD_REQS:
             user = form.save()
             login(request, user)
             return redirect('home')  # Redirect to home page
+
     else:
         form = UserRegistrationForm()
     return render(request, 'WebApp/register.html', {'form': form})

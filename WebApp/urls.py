@@ -24,6 +24,8 @@ urlpatterns = [
     path('manage_missions/', manage_missions, name='manage_missions'),
     path("teams/", manage_teams, name="teams"),
     path('save_photo', save_photo, name='save_photo'),
+    path("shop", shop, name="shop"),
+    path("shop/<str:itemname>/", buy_shop, name="buy")
 ]
 
 if settings.DEBUG:
