@@ -10,6 +10,7 @@
 
         <form method="post">
             {% csrf_token %}
+            
             <div class="form-group mb-3">
                 <input type="text" name="username" class="form-control" placeholder="Username" required>
             </div>
@@ -18,10 +19,15 @@
             </div>
             <div class="form-group mb-4">
                 <input type="password" name="password1" class="form-control" placeholder="Password" required>
-                <small class="form-text text-muted" style="padding-top: 5px;">{{ form.password1.help_text }}</small>
+                <small class="form-text text-muted">{{ form.password1.help_text }}</small>
             </div>
             <div class="form-group mb-4">
                 <input type="password" name="password2" class="form-control" placeholder="Confirm Password" required>
+            </div>
+            <div class="form-group mb-4">
+                <label for="user_type" class="form-label font-weight-bold">{{ form.user_type.label }}</label>
+                {{ form.user_type }}
+                <small class="form-text text-muted">{{ form.user_type.help_text }}</small>
             </div>
             <div class="text-center mt-3">
                 <button type="submit" class="btn btn-success w-100 mt-3">Register</button>
@@ -31,11 +37,6 @@
             <a href="{% url 'login' %}" class="text-success">Already have an account? Login</a>
         </div>
     </div>
-</div>
-<div class="mt-4 p-5 text-center">
-    <label for="user_type" class="form-label font-weight-bold">{{ form.user_type.label }}</label>
-    {{ form.user_type }}
-    <small class="form-text text-muted" style="padding-top: 5px;">{{ form.user_type.help_text }}</small>
 </div>
 
 <style>
