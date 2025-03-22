@@ -96,8 +96,16 @@
 <div class="container main-content">
     <h1 style="text-align: center;">Your Pet!</h1>
     <div style="text-align: center;">
-        {% if profile.score == 10 %}
+        {% if profile.score > 40 %}
         <img src="{% static 'BPsix.png' %}" alt="Bean" width="250" height="250" />
+        {% if profile.score == 40 %}
+        <img src="{% static 'BPfive.png' %}" alt="Bean" width="250" height="250" />
+        {% if profile.score == 30 %}
+        <img src="{% static 'BPfour.png' %}" alt="Bean" width="250" height="250" />
+        {% if profile.score == 20 %}
+        <img src="{% static 'BPthree.png' %}" alt="Bean" width="250" height="250" />
+        {% if profile.score == 10 %}
+        <img src="{% static 'BPtwo.png' %}" alt="Bean" width="250" height="250" />
         {% else %}
         <img src="{% static 'BPone.png' %}" alt="Bean" width="250" height="250" />
         {% endif %}
