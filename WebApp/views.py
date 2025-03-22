@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import FileResponse, JsonResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import call_command
@@ -251,6 +251,38 @@ def home(request):
 
 def about(request):
     return render(request, 'WebApp/about.html')
+
+@login_required
+def datareq(request, username):
+    user, profile = _get_user_data(request)
+    
+
+    profileDataFields = {
+        "score" : profile.score,
+        "bio" : profile.bio,
+        "profile picture" : profile.profile_picture, 
+        "credit count" : profile.credits
+    }
+    userDataFields = {
+        "username" : user.username, 
+        "first name" : user.first_name, "last name" : user.last_name,
+        "email" : user.email,
+        "date joined" : user.date_joined, "last login date" : user.last_login_date, 
+        "login streak" : user.login_streak
+    }
+
+    f = open("userdata.txt", "w+")
+
+    for key in profileDataFields:
+        f.write(f'{key} = {profileDataFields[key]}\n')
+    for key in userDataFields:
+        f.write(f'{key} = {userDataFields[key]}\n')
+
+    f.close()
+
+
+    # return alert(request, "started download");
+    return FileResponse(open("userdata.txt", "rb"), filename="userdata.txt")
 
 
 def alert(request, message):

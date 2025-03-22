@@ -11,6 +11,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('profile/', redirect_to_profile, name='redirect_to_profile'),
     path('profile/<str:username>/', profile, name='profile'),
+    path("profile/<str:username>/datareq", datareq, name="data_request"),
 
     path("profile/<str:username>/accept/<str:accepter_id>/<str:accepted_id>", accept_req),
     path("profile/<str:username>/reject/<str:rejecter_id>/<str:rejected_id>", reject_req),

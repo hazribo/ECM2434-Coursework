@@ -101,8 +101,8 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
-    inventory = models.ManyToManyField(ShopItem)
-    equipped = models.ManyToManyField(ShopItem)
+    inventory = models.ManyToManyField(ShopItem, related_name="inv")
+    equipped = models.ManyToManyField(ShopItem, related_name="eqi")
 
     friend_requests = models.ManyToManyField(User, related_name = "friend_requests")
     friend_list = models.ManyToManyField(User, related_name = "friend_list")
