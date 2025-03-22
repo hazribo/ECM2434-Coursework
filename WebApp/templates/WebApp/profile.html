@@ -95,7 +95,7 @@
 
 <div class="col mt-2"><div class="character-box rounded-box">
     <h1 style="text-align: center;">Your Pet!</h1>
-    <div style="text-align: center;">
+    <div style="text-align: center;"><div class="character-box rounded-box">
         {% if profile.score > 40 %}
         <img src="{% static 'BPsix.png' %}" alt="Bean" width="250" height="250" />
         {% elif profile.score == 40 %}
@@ -109,7 +109,7 @@
         {% else %}
         <img src="{% static 'BPone.png' %}" alt="Bean" width="250" height="250" />
         {% endif %}
-    </div>
+    </div></div>
         {% if profile.score > 40 %}
         <p style="text-align: center;">Bean Happiness: 6/6 </p>
         <p style="text-align: center;">Your bean is at full happiness! </p>
@@ -121,13 +121,13 @@
         <p style="text-align: center;">Get 20 more points for max happiness! </p>
         {% elif profile.score == 20 %}
         <p style="text-align: center;">Bean Happiness: 3/6 </p>
-        <p style="text-align: center;">Get 10 more points for max happiness! </p>
+        <p style="text-align: center;">Get 30 more points for max happiness! </p>
         {% elif profile.score == 10 %}
         <p style="text-align: center;">Bean Happiness: 2/6 </p>
-        <p style="text-align: center;">Get 10 more points for max happiness! </p>
+        <p style="text-align: center;">Get 40 more points for max happiness! </p>
         {% else %}
         <p style="text-align: center;">Bean Happiness: 1/6 </p>
-        <p style="text-align: center;">Get 10 more points for max happiness! </p>
+        <p style="text-align: center;">Get 50 more points for max happiness! </p>
         {% endif %}
 </div></div>
 
@@ -287,6 +287,10 @@
     .character-box {
         max-width: 400px;
         background-color: #2a692d;
+    }
+    .pet-box {
+        max-width: 200px;
+        background-color: #FFFFFF;
     }
     .image-gallery-container {
     margin-top: 20px;
