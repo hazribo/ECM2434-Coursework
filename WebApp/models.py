@@ -1,9 +1,11 @@
+from os import name
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import models
 from django.utils.timezone import now, localtime
 from datetime import timedelta
+from PIL import Image
 
 # TODO make seperate section for daily / other missions in missions.html
 
@@ -54,7 +56,24 @@ class User(AbstractUser):
         self.login_streak = 0
         #print(f"New score: {profile.score}, streak reset to {self.login_streak}")
         return
-  
+
+    def _get_GDPR_data(user):
+
+        userData = ''
+
+        for key in (fields := {
+            "username" : user.username, 
+            "first name" : user.first_name, 
+            "last name" : user.last_name,
+            "email" : user.email,
+            "date joined" : user.date_joined,
+            "last login date" : user.last_login_date, 
+            "login streak" : user.login_streak,
+            "user type" : user.user_type
+        }):
+            userData += (f'{key} = {fields[key]}\n')
+        
+        return userData
 
 
 # Shop item class
@@ -64,6 +83,8 @@ class ShopItem(models.Model):
     name = models.CharField(max_length = 100, unique = True)
     cost = models.IntegerField(default=1)
     
+    def __str__(self) -> str:
+        return f"(cosmetic) {self.name} ({self.cost} credits)"
 
 
 
@@ -113,6 +134,37 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
+    def get_pfp(self):
+        return Image.open(self.profile_picture.path)            \
+               if self.profile_picture is not None else None
+
+    def get_GDPR_data(profile):
+
+        profileData = ''
+
+        for key in (fields := {
+            "score" : profile.score,
+            "bio" : profile.bio,
+            "profile picture" : profile.profile_picture, 
+            "credit count" : profile.credits,
+            "cosmetic inventory" : 
+                ', '.join([str(item) for item in profile.inventory.all()]),
+            "equipped cosmetics" : 
+                ', '.join([str(item) for item in profile.equipped.all()]),
+            "friend list" :
+                ', '.join([str(item) for item in profile.friend_list.all()]),
+            "friend request list" :
+                ', '.join([str(item) for item in profile.friend_requests.all()]),
+            "team" : profile.team
+        }):
+            profileData += (f'{key} = {fields[key]}\n')
+
+        userData = profile.user._get_GDPR_data()
+        
+        return f'PROFILE DATA = \n{profileData}\nUSER DATA = \n{userData}';
+
+        
     
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

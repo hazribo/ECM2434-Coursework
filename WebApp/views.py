@@ -1,7 +1,8 @@
+import django
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
-from django.http import FileResponse, JsonResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponse, JsonResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import call_command
@@ -30,6 +31,8 @@ def getTimeNow(): return getNow()
 # Friend system code:
 _IGNORE_PASSWORD_REQS = False
 _NoSearchString = "NONE"
+
+_GDPR_RETURN_FILE_NAME = "userdata"
 
 def _get_user_data(request):
     user = request.user
@@ -256,35 +259,39 @@ def about(request):
 
 @login_required
 def datareq(request, username):
-    user, profile = _get_user_data(request)
+    _, profile = _get_user_data(request)
     
+    userData = profile.get_GDPR_data()
+    pfpData = profile.get_pfp()
 
-    profileDataFields = {
-        "score" : profile.score,
-        "bio" : profile.bio,
-        "profile picture" : profile.profile_picture, 
-        "credit count" : profile.credits
-    }
-    userDataFields = {
-        "username" : user.username, 
-        "first name" : user.first_name, "last name" : user.last_name,
-        "email" : user.email,
-        "date joined" : user.date_joined, "last login date" : user.last_login_date, 
-        "login streak" : user.login_streak
-    }
+    pfpData = "\n" + str(pfpData if pfpData is None else 
+                         [item for item in pfpData.getdata()]) 
 
-    f = open("userdata.txt", "w+")
+    # proper way, force file download
+    response = HttpResponse(userData + str(pfpData), content_type="application/text charset=utf-8");
+    response["Content-Disposition"] = f"attatchment; filename={_GDPR_RETURN_FILE_NAME}.txt"
 
-    for key in profileDataFields:
-        f.write(f'{key} = {profileDataFields[key]}\n')
-    for key in userDataFields:
-        f.write(f'{key} = {userDataFields[key]}\n')
-
-    f.close()
+    return response
 
 
-    # return alert(request, "started download");
-    return FileResponse(open("userdata.txt", "rb"), filename="userdata.txt")
+    # gives data to browser directly as file response, 
+    # makes browser choose how to display data (inconsistent)
+
+    # f = open("userdata.txt", "w+")
+
+    # for key in profileDataFields:
+    #     f.write(f'{key} = {profileDataFields[key]}\n')
+    # for key in userDataFields:
+    #     f.write(f'{key} = {userDataFields[key]}\n')
+
+    # f.close()
+
+
+    # # return alert(request, "started download");
+    # return FileResponse(open("userdata.txt", "rb"), filename="userdata.txt")
+
+
+
 
 
 
