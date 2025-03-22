@@ -23,6 +23,7 @@ from PIL import Image
 import base64
 from io import BytesIO
 from django.core.files.base import ContentFile
+from os import remove
 
 def getTimeNow(): return getNow()
 
@@ -252,6 +253,7 @@ def home(request):
 def about(request):
     return render(request, 'WebApp/about.html')
 
+
 @login_required
 def datareq(request, username):
     user, profile = _get_user_data(request)
@@ -283,6 +285,8 @@ def datareq(request, username):
 
     # return alert(request, "started download");
     return FileResponse(open("userdata.txt", "rb"), filename="userdata.txt")
+
+
 
 
 def alert(request, message):
