@@ -96,7 +96,11 @@
 <div class="container main-content">
     <h1 style="text-align: center;">Your Pet!</h1>
     <div style="text-align: center;">
-        <img src="{% static 'BPfour.png' %}" alt="Bean" width="250" height="250" />
+        {% if profile.score == 10 %}
+        <img src="{% static 'BPsix.png' %}" alt="Bean" width="250" height="250" />
+        {% else %}
+        <img src="{% static 'BPone.png' %}" alt="Bean" width="250" height="250" />
+        {% endif %}
     </div>
     <h1 style="text-align: center;">Complete missions to feed your pet!</h1>
 </div>
