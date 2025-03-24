@@ -23,16 +23,15 @@
             <form class="complete-mission-form" data-mission-id="{{ mission.id }}"
                 data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
                 {% csrf_token %}
+                <display flex>
                 <button type="submit" class="btn btn-primary w-100 clickable">
                     {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
                 </button>
+
                 <div id="map"> </div>
                 <script>
 
-                    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        minZoom: 16,
-                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    }).addTo(map);
+                    
 
                     // Center view on target
                     var map = L.map('map').setView(["{{ mission.latitude }}", "{{ mission.longitude }}"], 13);
@@ -45,7 +44,10 @@
                         radius: 10
                     }).addTo(map);
 
-                    
+                    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        minZoom: 16,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
                     // Not ideal using a different location method, but this is just as an indication of 
                     // location.
                     map.locate({ setView: false, maxZoom: 16 });
@@ -63,6 +65,7 @@
                         polyLine.addTo(map);
                     }
                 </script>
+                </display>
             </form>
             {% else %}
             <!-- Mission without location -->
