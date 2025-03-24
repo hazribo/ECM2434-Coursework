@@ -1,16 +1,25 @@
 from .models import ShopItem
 
 SHOP_ITEMS = [
-    {
-        "name" : "item1",
-        "cost" : 2,
-        "thPath" : "item1.png"
-    },
-    {
-        "name" : "item2",
-        "cost" : 3,
-        "thPath" : "item2.png"
-    }
+
+    {"name" : "AllBlackShoes",  "cost" : 1, "thPath" : "cosmetics/AllBlackShoes.png" },
+    {"name" : "BlackShoes",     "cost" : 1, "thPath" : "cosmetics/BlackShoes.png" },
+    {"name" : "BlueShoes",      "cost" : 1, "thPath" : "cosmetics/BlueShoes.png" }, 
+    {"name" : "BrownShoes",     "cost" : 1, "thPath" : "cosmetics/BrownShoes.png" },
+    {"name" : "GreenShoes",     "cost" : 1, "thPath" : "cosmetics/GreenShoes.png" },
+    {"name" : "PinkShoes",      "cost" : 1, "thPath" : "cosmetics/PinkShoes.png" },
+    {"name" : "RedShoes",       "cost" : 1, "thPath" : "cosmetics/RedShoes.png" },
+
+    {"name" : "RedCap",         "cost" : 3, "thPath" : "cosmetics/RedCap.png" },
+    {"name" : "BlackCap",       "cost" : 3, "thPath" : "cosmetics/BlackCap.png" },
+
+    {"name" : "BlueTopHat",     "cost" : 2, "thPath" : "cosmetics/BlueTopHat.png" },
+    {"name" : "BrownHat",       "cost" : 2, "thPath" : "cosmetics/BrownHat.png" },
+    {"name" : "PirateHat",      "cost" : 2, "thPath" : "cosmetics/PirateHat.png" },
+    {"name" : "RedTopHat",      "cost" : 2, "thPath" : "cosmetics/RedTopHat.png" },
+    {"name" : "CowboyHat",      "cost" : 2, "thPath" : "cosmetics/CowboyHat.png" },
+
+    {"name" : "BPsix",          "cost" : 10, "thPath" : "cosmetics/BPsix.png" },
    
 ]
 
@@ -52,7 +61,7 @@ def distillItemData(item):
     data = ShopItemData()
     data.name = item.name
     data.cost = item.cost
-    data.thpath = item.name + ".png"
+    data.thpath = r"cosmetics/" + item.name + ".png"
     data.buyurl = f"shop/{item.name}/"
     return data
 
@@ -74,7 +83,8 @@ def shop_init():
         print("added all")
         return
     
-    ShopItem.objects.all().delete()
+    if ShopItem.objects.count() > len(SHOP_ITEMS):
+        ShopItem.objects.all().delete()
 
     for index, item in enumerate(SHOP_ITEMS):
         shItem = ShopItem.objects.create(
@@ -84,4 +94,4 @@ def shop_init():
         shItem.save()
         
         
-shop_init()
+# shop_init()

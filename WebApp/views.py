@@ -13,7 +13,7 @@ from .leaderboard_src import *
 from .search_src import search_for_username
 from .friendsystem_src import *
 from .missions_src import get_user_missions, tick_repeating_missions
-from .shop_src import get_shop_items, user_buy, get_inventory_items
+from .shop_src import get_shop_items, user_buy, get_inventory_items, shop_init
 # geopy for location views:
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
@@ -315,6 +315,8 @@ def buy_shop(request, itemname):
 @login_required
 def shop(request):
 
+    shop_init()
+
     _, profile = _get_user_data(request)
 
     context = {
@@ -421,11 +423,17 @@ def profile(request, username=None):
     friend_request_list = get_friend_request_list(user_profile);
     friend_list = get_friend_list(user_profile)
 
+
+    
+    user_profile.render_bean_with_accessories().save(buffer := BytesIO(), "png")
+    bean_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
     context = {
         'profile': user_profile,
         'req_list' : friend_request_list,
         'friend_list' : friend_list,
         'mission_photos': mission_photos,
+        "bean_str" : bean_str
     };
 
     return render(request, 'WebApp/profile.html', context)

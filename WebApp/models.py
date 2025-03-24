@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.timezone import now, localtime
 from datetime import timedelta
 from PIL import Image
+from django.contrib.staticfiles import finders
 
 # TODO make seperate section for daily / other missions in missions.html
 
@@ -123,7 +124,7 @@ class Profile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     inventory = models.ManyToManyField(ShopItem, related_name="inv")
-    equipped = models.ManyToManyField(ShopItem, related_name="eqi")
+    # equipped = models.ManyToManyField(ShopItem, related_name="eqi")
 
     friend_requests = models.ManyToManyField(User, related_name = "friend_requests")
     friend_list = models.ManyToManyField(User, related_name = "friend_list")
@@ -131,6 +132,52 @@ class Profile(models.Model):
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name="profiles")
 
     credits = models.IntegerField(default=10)
+
+    def render_bean_with_accessories(self):
+        
+        path = finders.find("gbc3.png")
+        staticPath = path[:len(path) - 8]
+        base = Image.open(path)
+
+        baseSize = base.size
+
+        shoeN = 0; hatN = 0
+        
+        for accessoryObject in self.inventory.all():
+
+            accessoryImg = Image.open(staticPath + r"cosmetics/" + (accessoryObject.name + ".png"))
+
+            offset = (0, 0)
+
+            if ("Shoe" in accessoryObject.name):
+                
+                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+                
+                offset = (
+                    int(baseSize[0] / 2) - 200 + shoeN * 50,
+                    int(baseSize[1] / 2) + 100 + shoeN * 50
+                )
+
+                shoeN += 1
+
+            if ("Hat" in accessoryObject.name):
+                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+                
+                offset = (
+                    200 + hatN * 50,
+                    -100 + hatN * 50
+                )
+
+                hatN += 1
+
+
+            base.paste(accessoryImg, offset, accessoryImg)
+
+        return base
+
+
+
+
 
     def __str__(self):
         return f'{self.user.username} Profile'
