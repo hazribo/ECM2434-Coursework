@@ -28,21 +28,40 @@
                 </button>
                 <div id="map"> </div>
                 <script>
+
+                    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        minZoom: 16,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+
+                    // Center view on target
                     var map = L.map('map').setView(["{{ mission.latitude }}", "{{ mission.longitude }}"], 13);
-                    
+
+                    //  Shows the location and uncertainty checked for in the verifyMissionLocation function.
                     var circle = L.circle(["{{ mission.latitude }}", "{{ mission.longitude }}"], {
                         color: 'red',
                         fillColor: '#f03',
                         fillOpacity: 0.5,
                         radius: 10
                     }).addTo(map);
-                    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        minZoom: 16,
-                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    }).addTo(map);
-                    
-                    var marker = L.marker(["{{ mission.latitude }}", "{{ mission.longitude }}"]).addTo(map);
 
+                    
+                    // Not ideal using a different location method, but this is just as an indication of 
+                    // location.
+                    map.locate({ setView: false, maxZoom: 16 });
+
+                    map.on('locationfound', onLocationFound);
+                    function onLocationFound(e) {
+                        var targetLoc = new L.LatLng("{{ mission.latitude }}", "{{ mission.longitude }}");
+                        var pointList = [e.latlng, targetLoc];
+                        var polyLine = new L.Polyline(pointList, {
+                            color: 'red',
+                            weight: 3,
+                            opacity: 0.5,
+                            smoothFactor: 1
+                        });
+                        polyLine.addTo(map);
+                    }
                 </script>
             </form>
             {% else %}
