@@ -65,20 +65,25 @@ class Team(models.Model):
     members = models.ManyToManyField(User, related_name="teams", blank=True)
     score = models.IntegerField(default=0)
 
-    # Invite a member to your team:
+    # Join the team:
     def add_member(self, user):
         if user not in self.members.all():
             self.members.add(user)
-            self.update_team_score()
+            user.profile.team = self
+            print(self.members.all())
+            print(user.profile.team)
+            self.update_team()
 
     # Remove a member from your team:
     def remove_member(self, user):
         if user in self.members.all():
             self.members.remove(user)
-            self.update_team_score()
+            user.profile.team = None
+            self.save()
+            self.update_team()
 
-    # Update the cumulative team score:
-    def update_team_score(self):
+    # Update the cumulative team score and DB:
+    def update_team(self):
         self.score = sum(member.profile.score for member in self.members.all())
         self.save()
 
