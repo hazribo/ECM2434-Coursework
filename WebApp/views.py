@@ -83,11 +83,13 @@ def unchanged(request, *args, **kwargs):
 
 # Handles user accepting friend request:
 def accept_req(request, accepter_id, accepted_id, **kwargs):
+    print(f"Accept Request: {accepter_id} is accepting {accepted_id}")
     record_friend_request_response(accepter_id, accepted_id, True)
     return unchanged(request)
 
 # Handles user rejecting friend request:
 def reject_req(request, rejecter_id, rejected_id, **kwargs):
+    print(f"Reject Request: {rejecter_id} is rejecting {rejected_id}")
     record_friend_request_response(rejecter_id, rejected_id, False)
     return unchanged(request)
 
@@ -150,6 +152,7 @@ def missions(request):
     # Get data for provided username to display correct profile:
     user = get_object_or_404(User, username=username)
     user_profile = get_object_or_404(Profile, user=user)
+    team = user_profile.team
     tick_repeating_missions(user_profile);
 
     # Handle POST request (on mission completion):
@@ -187,6 +190,8 @@ def missions(request):
                     # ...and points awarded:
                     profile = request.user.profile
                     profile.score += mission.points
+                    if team:
+                        team.score += mission.points
                     profile.save()
                 # Return completion status for location_verified:
                 return JsonResponse({"status": "success", "requires_location": True, "location_verified": user_mission.completed, "distance": distance})
@@ -202,8 +207,12 @@ def missions(request):
                 profile = request.user.profile
                 if user_mission.completed:
                     profile.score += mission.points
+                    if team:
+                        team.score += mission.points
                 else: # Debug - in case of undo:
                     profile.score -= mission.points
+                    if team:
+                        team.score -= mission.points
                 profile.save()
                 # Return state of user_mission.completed:
                 return JsonResponse({"status": "success", "requires_location": False, "completed": user_mission.completed})
@@ -339,6 +348,9 @@ def profile(request, username=None):
     # Get the friend / friend request list for this profile:
     friend_request_list = get_friend_request_list(user_profile);
     friend_list = get_friend_list(user_profile)
+    # Debug - print these:
+    print(friend_request_list)
+    print(friend_list)
 
     context = {
         'profile': user_profile,
@@ -378,7 +390,7 @@ def manage_teams(request):
     # Initialise user, team, user_team:
     user = request.user
     teams = Team.objects.all()
-    user_team = user.profile.team if hasattr(user, "profile") else None
+    user_team = Team.objects.filter(members=user).first()
 
     if request.method == "POST":
         # Get action type, team_id:
@@ -401,6 +413,7 @@ def manage_teams(request):
         # Team leaving handling:
         elif action == "leave" and user_team:
             user_team.remove_member(user)
+            user_team = None
             return redirect("teams")
 
     return render(request, "WebApp/teams.html", {"teams": teams, "user_team": user_team})
