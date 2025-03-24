@@ -7,7 +7,9 @@ from datetime import timedelta
 
 # TODO make seperate section for daily / other missions in missions.html
 
-# Code for user data:
+# ------------------------------------------------------
+# USER CLASS - HANDLES LOGIN DATA, ACCOUNT TYPE...
+# ------------------------------------------------------
 class User(AbstractUser):
     USER_TYPES = (
         ('player', 'Player'),
@@ -21,7 +23,6 @@ class User(AbstractUser):
     last_login_date = models.DateField(null=True, blank=True)
 
     def calc_login_streak(self):
-        profile, created = Profile.objects.get_or_create(user=self)
         today = localtime(now()).date()
 
         # Already logged in today - return as usual.
@@ -55,34 +56,43 @@ class User(AbstractUser):
         #print(f"New score: {profile.score}, streak reset to {self.login_streak}")
         return
     
-# Code for teams (user guilds/clans):
+# ------------------------------------------------------
+# TEAM CLASS - HANDLES USER TEAMS
+# ------------------------------------------------------
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     team_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="led_teams")
     members = models.ManyToManyField(User, related_name="teams", blank=True)
     score = models.IntegerField(default=0)
 
-    # Invite a member to your team:
+    # Join the team:
     def add_member(self, user):
         if user not in self.members.all():
             self.members.add(user)
-            self.update_team_score()
+            user.profile.team = self
+            print(self.members.all())
+            print(user.profile.team)
+            self.update_team()
 
     # Remove a member from your team:
     def remove_member(self, user):
         if user in self.members.all():
             self.members.remove(user)
-            self.update_team_score()
+            user.profile.team = None
+            self.save()
+            self.update_team()
 
-    # Update the cumulative team score:
-    def update_team_score(self):
+    # Update the cumulative team score and DB:
+    def update_team(self):
         self.score = sum(member.profile.score for member in self.members.all())
         self.save()
 
     def __str__(self):
         return self.name
     
-# Code for user Profiles:
+# ------------------------------------------------------
+# PROFILE CLASS - HANDLES USER PROFILES & RELATED DATA
+# ------------------------------------------------------
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
@@ -106,7 +116,9 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-# Code for missions:
+# ------------------------------------------------------
+# MISSION CLASSES - HANDLES ALL MISSION TYPES / SCENARIOS
+# ------------------------------------------------------
 class Mission(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
