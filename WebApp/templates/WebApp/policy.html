@@ -5,56 +5,85 @@
     {% block content %}
     <div class="container main-content">
         <h1 class="text-center text-white bg-success rounded p-3">Climate Policy</h1>
+
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">Introduction</h2>
+            <p>
+                Our project is in line with the University Of Exeter goals for increasing sustainability on campus.
+                Specifically,
+            </p> 
+                <li>- Helping the university achieve carbon net zero by 2030</li>
+                <li>- Encouraging users to act in line with the UN's Sustainable Development Goals</li>
+                <li>- Encouraging users to visit parts of campus that promote biodiversity</li>
+        </div>
+
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">Achieving Carbon Net Zero</h2>
+            <p>
+                As students and staff using the University campus, we contribute to its carbon emissions, specifically
+                for scope 3 emissions (carbon emissions created by users of the campus). While the university works to reduce
+                scope 1 and scope 2 emissions (carbon emissions created by the university and its partnerships), we must help
+                reduce our own emissions as our part of preventing climate change. 
+            </p> 
+            <p>
+                The best way we can reduce our carbon emissions is by reducing our carbon footprint. By engaging with our
+                Green Beans project, missions are designed so that you slowly reduce your emissions simply by participating
+                with the game and levelling up your pet. We also encourage users to use the WWF's carbon footprint calculator
+                to gain additional advice, and watch as your footprint is reduced by engaging with your Bean Pet!
+            </p> 
+            <p>
+                https://footprint.wwf.org.uk/questionnaire
+            </p>
+        </div>
         
         <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
-            <h2 class="text-success text-center">About Our Project</h2>
+            <h2 class="text-success text-center">Sustainable Development Goals (SDG's)</h2>
             <p>
-                We were tasked with creating a web page using the Django system and following the Kanban methodology 
-                to encourage sustainability efforts on campus at the University of Exeter. We initially brainstormed many 
-                ideas for how we could use gamification principles to create an engaging web page that would be fun and keep users 
-                coming back. 
+                The University Of Exeter is currently ranked 12th globally among universities on the United Nations
+                SDG13 ranking for climate change mitigation, making it the highest ranked university in the United 
+                Kingdom as of 2024. This highlights its status as an important and vital participant in reducing
+                the effects of climate change globally. Additionaly, it is also ranked among universities as:
+            </p> 
+                <li>💧 1st Globally for SDG6 (Clean water sustainability)</li>
+                <li>🍎 Joint 7th Globally for SDG12 (Sustainable food production and consumption)</li>
+                <li>🐟 6th Globally for SDG14 (Protection of underwater life)</li>
+                <li>🐻 25th Globally for SDG15 (Protection of life on land)</li>
+            <p>
+                The University has shown that is at the forefront of sustainability worldwide, and therefore it is 
+                important as students and staff member using the campus and resources that we are aware of and help 
+                contribute to these goals. Our project encourages this as we encourage users to engage in sustainable
+                behaviour while on campus, such as recycling, using reusuable products and walking instead of driving.
+                This helps the univeristy keep in line with matching the Sustainable Development Goals and can even help
+                them rank higher and higher.
+            </p>
+        </div>
+
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">Visiting Sustainable Areas On Campus</h2>
+            <p>
+                Our project uses location tracking to create missions where users will visit areas on campus, in 
+                order to encourage users to visit certain areas on campus that they may not know about. The University
+                campus contains many biodiverse and sustainable areas that students and staff can engage with which will
+                not only the university achieve their goals, but allow users to see some beautiful nature!
+            </p> 
+            <p>
+                One location we encourage users to visit is the Exeter community garden. Many people may not be aware of this
+                area but it is an important area in which the university promotes and engages in sustainable practices.
+                We hope that some users who visit end up being inspired and becoming members!
             </p>
             <p>
-                We ultimately decided on using a pet-based challenge system, where users complete challenges to 
-                feed and "level up" their pet. This approach allows users to feel rewarded as they watch their 
-                pet grow and fosters collaboration as they compare pets. Customization of pets is tied to 
-                completing challenges, providing further motivation.
+                Another part of campus we hope to help people discover is the various trails that people can follow
+                throughout campus that are designed to show off the biodiversity of the campus! We recommend:
             </p>
-            <p>
-                In line with the eco-friendly theme and the concept of a pet "growing," we chose a green bean 
-                themed pet.
-            </p>
+                <li>🌳 Streatham Campus Tree Trail</li>
+                <li>🌷 Streatham Campus Biodiversity Trail</li>
+                <li>🎵 Streatham Campus Sound Trail</li>
         </div>
         
         <div class="text-center mb-4">
             <img src="{% static 'beanpet1.png' %}" alt="Pet Image" class="img-fluid rounded shadow" />
         </div>
         
-        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
-            <h2 class="text-success text-center">What We Wanted to Encourage:</h2>
-            <ul class="list-unstyled text-center">
-                <li>♻️ Recycling on campus!</li>
-                <li>🚶‍♂️ Walking or cycling over other methods of travel!</li>
-                <li>🛍️ Using reusables instead of single-use products!</li>
-                <li>💡 Reducing carbon footprint at home (e.g., food, lights)!</li>
-                <li>🏡 Visiting campus locations (e.g., sustainable gardens)!</li>
-                <li>🤝 Collaboration between users for eco challenges!</li>
-            </ul>
-        </div>
-        
-        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
-            <h2 class="text-success text-center">About Us</h2>
-            <p class="text-center">Developed By:</p>
-            <ul class="list-unstyled text-center">
-                <li>Artur Mialik</li>
-                <li>Chun Ming Leung</li>
-                <li>Ciaran Scott</li>
-                <li>Etienne Benfeghoul</li>
-                <li>Harry Gardner</li>
-                <li>Jack Field</li>
-                <li>Lamri Abdellaoui</li>
-            </ul>
-        </div>
     </div>
     {% endblock %}
 </html>
