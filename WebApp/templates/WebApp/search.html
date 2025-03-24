@@ -22,9 +22,8 @@
             </div>
 
             <!-- Friend Request Button -->
-            <form class="friend-request-form" data-user-id="{{ User.idVal }}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success btn-sm clickable">+</button>
+            <form action={{ User.idVal }}>
+                <button class="friend_add_button btn btn-success btn-sm clickable"  id={{ User.username }} type="submit">+</button>
             </form>
         </li>
         {% endfor %}
@@ -33,20 +32,13 @@
 
 <!-- JavaScript -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".friend-request-form").forEach(form => {
-        form.addEventListener("submit", function(event) {
-            event.preventDefault();
-            let button = this.querySelector("button");
-            let username = this.closest("li").querySelector("h5 a").textContent.trim();
-
-            // Send a friend request (Replace this with an AJAX request if needed)
+    let buttons = document.getElementsByClassName("friend_add_button");
+    for (let button of buttons) {
+        button.addEventListener("click", function () {
             button.innerHTML = "✔";
-            button.disabled = true;
-            alert("Friend request sent to " + username);
+            window.alert("sent friend request to " + button.id);
         });
-    });
-});
+    }
 </script>
 
 {% endblock %}
