@@ -1,1 +1,60 @@
-
+{% extends 'WebApp/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    {% block content %}
+    <div class="container main-content">
+        <h1 class="text-center text-white bg-success rounded p-3">About</h1>
+        
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">About Our Project</h2>
+            <p>
+                We were tasked with creating a web page using the Django system and following the Kanban methodology 
+                to encourage sustainability efforts on campus at the University of Exeter. We initially brainstormed many 
+                ideas for how we could use gamification principles to create an engaging web page that would be fun and keep users 
+                coming back. 
+            </p>
+            <p>
+                We ultimately decided on using a pet-based challenge system, where users complete challenges to 
+                feed and "level up" their pet. This approach allows users to feel rewarded as they watch their 
+                pet grow and fosters collaboration as they compare pets. Customization of pets is tied to 
+                completing challenges, providing further motivation.
+            </p>
+            <p>
+                In line with the eco-friendly theme and the concept of a pet "growing," we chose a green bean 
+                themed pet.
+            </p>
+        </div>
+        
+        <div class="text-center mb-4">
+            <img src="{% static 'beanpet1.png' %}" alt="Pet Image" class="img-fluid rounded shadow" />
+        </div>
+        
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">What We Wanted to Encourage:</h2>
+            <ul class="list-unstyled text-center">
+                <li>♻️ Recycling on campus!</li>
+                <li>🚶‍♂️ Walking or cycling over other methods of travel!</li>
+                <li>🛍️ Using reusables instead of single-use products!</li>
+                <li>💡 Reducing carbon footprint at home (e.g., food, lights)!</li>
+                <li>🏡 Visiting campus locations (e.g., sustainable gardens)!</li>
+                <li>🤝 Collaboration between users for eco challenges!</li>
+            </ul>
+        </div>
+        
+        <div class="card p-4 mb-4" style="background-color: #e6f4ea; border-radius: 15px;">
+            <h2 class="text-success text-center">About Us</h2>
+            <p class="text-center">Developed By:</p>
+            <ul class="list-unstyled text-center">
+                <li>Artur Mialik</li>
+                <li>Chun Ming Leung</li>
+                <li>Ciaran Scott</li>
+                <li>Etienne Benfeghoul</li>
+                <li>Harry Gardner</li>
+                <li>Jack Field</li>
+                <li>Lamri Abdellaoui</li>
+            </ul>
+        </div>
+    </div>
+    {% endblock %}
+</html>
