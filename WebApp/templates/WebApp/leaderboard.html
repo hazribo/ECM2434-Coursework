@@ -32,7 +32,8 @@
                 {% if leaderboard_type == "teams" %}
                     <img src="{% static 'images/default_team.png' %}" 
                         alt="{{ item.name }}" 
-                        class="rounded-full w-20 h-20 object-cover me-3">
+                        class="rounded-full w-20 h-20 object-cover me-3"
+                        style="width: 100px; height: 100px;">
                     <div>
                         <h6 class="mb-0">
                             {% if forloop.counter == 1 %}1st 🥇{% elif forloop.counter == 2 %}2nd 🥈{% else %}3rd 🥉{% endif %} - {{ item.name }}
@@ -41,7 +42,8 @@
                 {% else %}
                     <img src="{% if item.profile_picture and item.profile_picture.url %}{{ item.profile_picture.url }}{% else %}{% static 'nopfp.png' %}{% endif %}" 
                         alt="{{ item.user.username }}'s picture" 
-                        class="rounded-full w-20 h-20 object-cover me-3">
+                        class="rounded-full object-cover me-3"
+                        style="width: 100px; height: 100px;">
                     <div>
                         <h6 class="mb-0">
                             {% if forloop.counter == 1 %}1st 🥇{% elif forloop.counter == 2 %}2nd 🥈{% else %}3rd 🥉{% endif %} - {{ item.user.username }}
@@ -62,14 +64,16 @@
                 {% if leaderboard_type == "teams" %}
                     <img src="{% static 'images/default_team.png' %}" 
                         alt="{{ item.name }}" 
-                        class="rounded-full w-12 h-12 object-cover me-3">
+                        class="rounded-full w-12 h-12 object-cover me-3"
+                        style="width: 100px; height: 100px;">
                     <div>
                         <h6 class="mb-0">{{ item.name }}</h6>
                     </div>
                 {% else %}
                     <img src="{% if item.profile_picture and item.profile_picture.url %}{{ item.profile_picture.url }}{% else %}{% static 'nopfp.png' %}{% endif %}" 
                         alt="{{ item.user.username }}'s picture" 
-                        class="rounded-full w-12 h-12 object-cover me-3">
+                        class="rounded-full w-12 h-12 object-cover me-3"
+                        style="width: 100px; height: 100px;">
                     <div>
                         <h6 class="mb-0">{{ item.user.username }}</h6>
                     </div>
