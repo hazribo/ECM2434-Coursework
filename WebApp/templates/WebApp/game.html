@@ -6,7 +6,9 @@
     <p class="text-center">Currently logged in user: {{ profile.user.username }}</p>
     <div class="row mt-4 text-center justify-content-between">
         <div class="col"><div class="link rounded-box">
-            link to uni climate policy
+            <a href="{% url 'uni-policy' %}" class="link rounded-box button-link clickable">
+                University Climate Policy
+            </a>
         </div></div>
         <div class="col offset-md-6">
             <a href="{% url 'leaderboard' %}" class="link rounded-box button-link clickable">
