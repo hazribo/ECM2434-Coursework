@@ -11,7 +11,7 @@
         {% if user_team %}
         <div class="card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
             <h3 class="text-success">{{ user_team.name }}</h3>
-            <p class="lead"><strong>Leader:</strong> {{ user_team.team_leader.username }}</p>
+            <p class="lead"><strong>Leader:</strong> {{ user_team.team_owner.username }}</p>
             <p><strong>Score:</strong> {{ user_team.score }}</p>
 
             <form method="POST" class="leave-team-form">
@@ -46,7 +46,7 @@
         {% if team != user_team %}
         <li class="team-item card p-4 mb-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
             <h3 class="text-success">{{ team.name }}</h3>
-            <p class="lead"><strong>Leader:</strong> {{ team.team_leader.username }}</p>
+            <p class="lead"><strong>Leader:</strong> {{ team.team_owner.username }}</p>
             <p><strong>Score:</strong> {{ team.score }}</p>
             <form class="join-team-form">
                 {% csrf_token %}
@@ -103,29 +103,24 @@
 
         // Leave team functionality (optional, just in case you want it)
         $(".leave-team-form").submit(function (event) {
-            event.preventDefault();
+        event.preventDefault();
 
-            var form = $(this);
-            var button = form.find("button");
-
-            $.ajax({
-                url: "", // Uses the same URL (teams page)
-                type: "POST",
-                data: {
-                    "csrfmiddlewaretoken": form.find("input[name='csrfmiddlewaretoken']").val(),
-                    "action": "leave"
-                },
-                success: function () {
-                    // Hide "Your Team" section if the user leaves
-                    $("#your-team-section").hide();
-                    button.text("Left").prop("disabled", true);
-                },
-                error: function () {
-                    alert("An error occurred while leaving the team.");
-                }
-            });
+        $.ajax({
+            url: "", // Teams page
+            type: "POST",
+            data: {
+                "csrfmiddlewaretoken": $(this).find("input[name='csrfmiddlewaretoken']").val(),
+                "action": "leave"
+            },
+            success: function () {
+                location.reload(); // Reload to reflect the team removal
+            },
+            error: function (xhr) {
+                alert("An error occurred: " + xhr.responseText);
+            }
         });
     });
+});
 </script>
 
 {% endblock %}
