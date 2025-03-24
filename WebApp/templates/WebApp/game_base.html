@@ -1,110 +1,159 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Homepage</title>
-    
-        <link href="{% static 'css/globalstyles.css' %}" rel="stylesheet"/>
-        <!-- Local Bootstrap CSS -->
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <style>
-            body {
-                padding-top: 56px; /* Adjust for fixed navbar */
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Homepage</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <link href="{% static 'css/globalstyles.css' %}" rel="stylesheet" />
+    <!-- Local Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <style>
+
+    </style>
+
+
+
+    <style>
+        #map {
+            height: 200px;
+
+        }
+
+        body {
+            padding-top: 56px;
+            /* Adjust for fixed navbar */
+        }
+
+        .navbar {
+            background-color: #003C3C;
+            /* University of Exeter website colour */
+        }
+
+        .navbar-brand:hover,
+        .nav-link:hover {
+            background-color: #002727 !important;
+            /* Darker green on hover */
+        }
+
+        .navbar-brand,
+        .nav-link {
+            color: white !important;
+            /* Force white text */
+            font-weight: bold !important;
+            /* Make text bold */
+        }
+
+        .navbar-brand:hover,
+        .nav-link:hover {
+            color: #f8f9fa !important;
+            /* Slightly lighter white on hover */
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .menu-link {
+            font-size: 1rem !important;
+            font-weight: bold !important;
+            text-transform: uppercase;
+            color: #FFD700 !important;
+            /* Gold color */
+        }
+
+        .menu-link:hover {
+            color: #FFC107 !important;
+            /* Slightly darker gold on hover */
+        }
+
+        .navbar-center {
+            flex: 3;
+            /* Allow this to take available space */
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Make the collapsed navbar brighter: */
+        .navbar-toggler {
+            background-color: #006f6f;
+        }
+
+        .navbar-toggler:hover {
+            background-color: #004c4c;
+        }
+
+        /* Responsive navbar adjustments */
+        @media (max-width: 992px) {
+            .navbar-nav {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
             }
-            .navbar {
-                background-color: #003C3C; /* University of Exeter website colour */
-            }
-            .navbar-brand:hover, .nav-link:hover {
-                background-color: #002727 !important; /* Darker green on hover */
-            }
-            .navbar-brand, .nav-link {
-                color: white !important; /* Force white text */
-                font-weight: bold !important; /* Make text bold */
-            }
-            .navbar-brand:hover, .nav-link:hover {
-                color: #f8f9fa !important; /* Slightly lighter white on hover */
-            }
-            .main-content {
-                padding: 20px;
-            }
-            .menu-link {
-                font-size: 1rem !important; 
-                font-weight: bold !important;
-                text-transform: uppercase;
-                color: #FFD700 !important; /* Gold color */
-            }
-            .menu-link:hover {
-                color: #FFC107 !important; /* Slightly darker gold on hover */
-            }
+
             .navbar-center {
-                flex: 3; /* Allow this to take available space */
-                display: flex;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-item {
+                margin: 5px 0;
+            }
+
+            .search-bar {
+                width: 100%;
                 justify-content: center;
-            }
-            /* Make the collapsed navbar brighter: */
-            .navbar-toggler {
-                background-color: #006f6f; 
-            }
-            .navbar-toggler:hover {
-                background-color: #004c4c; 
+                margin-top: 10px;
             }
 
-            /* Responsive navbar adjustments */
-            @media (max-width: 992px) {
-                .navbar-nav {
-                    flex-direction: column;
-                    align-items: center;
-                    width: 100%;
-                }
-                .navbar-center {
-                    flex-direction: column;
-                    width: 100%;
-                    text-align: center;
-                }
-                .nav-item {
-                    margin: 5px 0;
-                }
-                .search-bar {
-                    width: 100%;
-                    justify-content: center;
-                    margin-top: 10px;
-                }
-                .search-bar input {
-                    width: 70%;
-                }
+            .search-bar input {
+                width: 70%;
             }
-        </style>
-    </head>
+        }
+    </style>
+</head>
 
-<body>     
+<body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
-        <div class="container">  
+        <div class="container">
             <a class="navbar-brand" href="/game">Green Beans</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav w-100 d-flex justify-content-between align-items-center"> 
+                <ul class="navbar-nav w-100 d-flex justify-content-between align-items-center">
                     <div class="navbar-center d-flex flex-lg-row flex-column">
                         <li class="nav-item mx-lg-5 my-2 my-lg-0">
                             <a class="nav-link menu-link" href="{% url 'missions' %}">MISSIONS</a>
                         </li>
                         <li class="nav-item mx-lg-5 my-2 my-lg-0">
                             <a class="nav-link menu-link" href="{% url 'leaderboard' %}">LEADERBOARD</a>
-                        </li> 
+                        </li>
                         <li class="nav-item mx-lg-5 my-2 my-lg-0">
-                            <a class="nav-link menu-link" href="{% url 'profile' username=user.username %}">MY PROFILE</a>
+                            <a class="nav-link menu-link" href="{% url 'profile' username=user.username %}">MY
+                                PROFILE</a>
                         </li>
                     </div>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
                 </ul>
-                <form class="d-flex search-bar" action="{% url 'profile' username='temp_user' %}" method="GET" id="search-form"> 
-                    <input class="form-control me-2" type="search" name="username" placeholder="Search users..." aria-label="Search" id="search-input">
+                <form class="d-flex search-bar" action="{% url 'profile' username='temp_user' %}" method="GET"
+                    id="search-form">
+                    <input class="form-control me-2" type="search" name="username" placeholder="Search users..."
+                        aria-label="Search" id="search-input">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>
@@ -113,7 +162,7 @@
 
     <!-- JS for Search Bar -->
     <script>
-        document.getElementById('search-form').addEventListener('submit', function(event) {
+        document.getElementById('search-form').addEventListener('submit', function (event) {
             event.preventDefault();  // Prevent default form submission
             const username = document.getElementById('search-input').value.trim();
             if (username) {
@@ -123,6 +172,8 @@
         });
     </script>
 
+    <script src="{% static 'js/leafletMaps.js' %}"></script>
+    
     <!-- Local Bootstrap JS -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
@@ -130,5 +181,6 @@
         {% block content %}
         {% endblock content %}
     </div>
-  </body>
+</body>
+
 </html>

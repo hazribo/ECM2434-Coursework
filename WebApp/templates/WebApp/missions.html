@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block content %}
+
+
 <div class="container main-content">
     <h1 class="text-center text-white bg-success rounded p-4 mb-4">One Time Missions</h1>
     <ul class="list-unstyled">
@@ -16,18 +18,40 @@
             {% if user_mission.mission == mission %}
             {% if mission.latitude and mission.longitude %}
             <!-- Mission with location -->
-            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
-            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be
+                verified{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}"
+                data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary w-100 clickable">
                     {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
                 </button>
+                <div id="map"> </div>
+                <script>
+                    var map = L.map('map').setView(["{{ mission.latitude }}", "{{ mission.longitude }}"], 13);
+                    
+                    var circle = L.circle(["{{ mission.latitude }}", "{{ mission.longitude }}"], {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.5,
+                        radius: 10
+                    }).addTo(map);
+                    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        minZoom: 16,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+                    
+                    var marker = L.marker(["{{ mission.latitude }}", "{{ mission.longitude }}"]).addTo(map);
+
+                </script>
             </form>
             {% else %}
             <!-- Mission without location -->
             <p>{{mission.mission_type}}</p>
-            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
-            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}
+            </p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}"
+                data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success clickable w-100">
                     {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
@@ -54,18 +78,25 @@
             {% if user_mission.mission == mission %}
             {% if mission.latitude and mission.longitude %}
             <!-- Mission with location -->
-            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be verified{% endif %}</p>
-            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Location to be
+                verified{% endif %}</p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}"
+                data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary w-100 clickable">
                     {% if user_mission.completed %}Undo{% else %}Verify Location{% endif %}
                 </button>
+
             </form>
+
+
             {% else %}
             <!-- Mission without location -->
             <p>{{mission.mission_type}}</p>
-            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}</p>
-            <form class="complete-mission-form" data-mission-id="{{ mission.id }}" data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
+            <p class="mission-status">Status: {% if user_mission.completed %}Completed{% else %}Not Completed{% endif %}
+            </p>
+            <form class="complete-mission-form" data-mission-id="{{ mission.id }}"
+                data-latitude="{{ mission.latitude }}" data-longitude="{{ mission.longitude }}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success clickable w-100">
                     {% if user_mission.completed %}Undo{% else %}Complete{% endif %}
@@ -207,33 +238,33 @@
             .catch(function (error) {
                 alert("Unable to access the camera: " + error.message);
             });
-        }
+    }
 
     // Function to send captured photo to the server
     function savePhotoToProfile(imageData, missionId) {
-    $.ajax({
-        url: "{% url 'save_photo' %}",
-        type: "POST",
-        contentType: "application/json",  
-        headers: {
-            "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()  // Ensure CSRF token is included
-        },
-        data: JSON.stringify({  
-            'image_data': imageData,  
-            'mission_id': missionId  
-        }),
-        success: function (response) {
-            if (response.status === "success") {
-                alert("Photo successfully saved to your profile!");
-            } else {
-                alert("There was an error saving your photo: " + response.message);
+        $.ajax({
+            url: "{% url 'save_photo' %}",
+            type: "POST",
+            contentType: "application/json",
+            headers: {
+                "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()  // Ensure CSRF token is included
+            },
+            data: JSON.stringify({
+                'image_data': imageData,
+                'mission_id': missionId
+            }),
+            success: function (response) {
+                if (response.status === "success") {
+                    alert("Photo successfully saved to your profile!");
+                } else {
+                    alert("There was an error saving your photo: " + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error:", error);
+                alert("An error occurred while saving the photo.");
             }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            alert("An error occurred while saving the photo.");
-        }
-    });
-}
+        });
+    }
 </script>
 {% endblock %}
