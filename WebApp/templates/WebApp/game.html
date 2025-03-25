@@ -1,51 +1,44 @@
 {% extends 'WebApp/game_base.html' %}
 {% load static %}
+
 {% block content %}
-<div class="container">
-    <!-- Top Section -->
-    <p class="text-center">Currently logged in user: {{ profile.user.username }}</p>
-    <div class="row mt-4 text-center justify-content-between">
+<div class="container mt-4">
+    <div class="card p-4 shadow-lg" style="background-color: #e6f4ea; border-radius: 15px;">
+        <p class="text-center text-dark font-weight-bold">Currently logged in user: {{ profile.user.username }}</p>
+    </div>
+
+    <!-- Nav Links -->
+    <div class="row mt-4 text-center">
         <div class="col">
-            <a href="{% url 'policy' %}" class="link rounded-box button-link clickable">
-                Link to our policies!
-            </a>
-             
-            <!-- uni link -->
+            <a href="{% url 'policy' %}" class="btn btn-success w-100 py-3 shadow-lg">Policies</a>
         </div>
-        <div class="col offset-md-6">
-            <a href="{% url 'leaderboard' %}" class="link rounded-box button-link clickable">
-                Leaderboard
-            </a>
+        <div class="col">
+            <a href="{% url 'leaderboard' %}" class="btn btn-success w-100 py-3 shadow-lg">Leaderboard</a>
         </div>
     </div>
 
-    <!-- Middle Section -->
+    <!-- Game Sections -->
     <div class="row mt-4 text-center">
-        <!-- Mission Section -->
-        <div class="col mt-2">
-            <a href="{% url 'missions' %}" class="link rounded-box button-link clickable">
-                Missions
-            </a>
+        <div class="col">
+            <a href="{% url 'missions' %}" class="btn w-100 py-3 shadow-lg"><h4 class="text-dark">Missions</h4></a>
         </div>
-        <!-- Pet Section -->
-        <div class="col mt-2"><div class="character-box rounded-box">
-            <h4>Feed Your Pet!</h4>
-            <img src="{% static 'BPgif.gif' %}" alt="Bean" class="pet-image"/>
-        </div></div>
-        <!-- Friend List -->
-        <div class="col mt-2"><div class="box rounded-box">
-            <h4>Friend List</h4>
-            {% for friendProfile in friend_list %}
-            <div class="friend-item">
-                {% if friendProfile.hasPfp %}
-                    <img class="pfp_thumbnail" src="{{ friendProfile.pfpUrl }}" />
-                {% else %}
-                    <img class="pfp_thumbnail" src="{% static 'nopfp.png' %}" />
-                {% endif %}
-                <a class="clickable" href="{{ friendProfile.link }}">{{ friendProfile.name }}</a>
+        <div class="col">
+            <div class="card p-4 shadow-lg text-center" style="background-color: #f8f9fa; border-radius: 15px;">
+                <h4 class="text-dark">Feed Your Pet!</h4>
+                <img src="{% static 'BPgif.gif' %}" alt="Bean" class="img-fluid rounded" style="max-width: 150px;"/>
             </div>
-            {% endfor %}
-        </div></div>
+        </div>
+        <div class="col">
+            <div class="card p-4 shadow-lg text-center" style="background-color: #f8f9fa; border-radius: 15px;">
+                <h4 class="text-dark">Friend List</h4>
+                {% for friendProfile in friend_list %}
+                <div class="d-flex align-items-center mt-2">
+                    <img class="pfp_thumbnail" src="{% if friendProfile.pfpUrl %}{{ friendProfile.pfpUrl }}{% else %}{% static 'nopfp.png' %}{% endif %}" />
+                    <a href="{{ friendProfile.link }}" class="ml-2 text-success font-weight-bold">{{ friendProfile.name }}</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
     <!-- Progress Bar -->
@@ -54,20 +47,13 @@
     </div>
 
     <!-- Shop -->
-    <div class="d-flex flex-row justify-content-center text-center mt-5">
-        <div class="box rounded-box">
-            <a href="{% url 'shop' %}" class="link button-link clickable">
-                Shop
-            </a>
-        </div>
-        <div class="credits rounded-box">Credits</div>
+    <div class="text-center mt-5">
+        <a href="{% url 'shop' %}" class="btn btn-success py-3 px-5 shadow-lg">Shop</a>
     </div>
 </div>
 
+
 <style>
-
-
-
     .container {
         font-size: 1.3rem;
     }
