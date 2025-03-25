@@ -149,7 +149,7 @@ class Profile(models.Model):
 
             offset = (0, 0)
 
-            if ("Shoe" in accessoryObject.name):
+            if ("Shoe" in accessoryObject.name or "Cap" in accessoryObject.name):
                 
                 accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
                 
