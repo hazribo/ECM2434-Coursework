@@ -352,7 +352,8 @@ def game(request):
     context = {
         'profile': user_profile,
         'friend_list' : friend_list,
-        'user_missions': user_missions
+        'user_missions': user_missions,
+        "player_credits" : user_profile.credits
     }
     return render(request, 'WebApp/game.html', context)
 
@@ -421,32 +422,49 @@ def profile(request, username=None):
 
     score = user_profile.score
 
-    if score > 50:
-        path = "gbc3.png"
 
-    elif score > 40:
+
+
+
+    # if score > 50:
+    #     path = "gbc3.png"
+    #     bt1 = "Bean Happiness: 6/6"
+    #     bt2 = "Your bean is at full happiness!"
+
+    if score > 40:
         path = "BPsix.png"
+        # bt1 = "Bean Happiness: 5/6"
+        bt2 = "Get 10 more points for max happiness!"
 
     elif score > 30:
         path = "BPfive.png"
+        # bt1 = "Bean Happiness: 4/6"
+        bt2 = "Get 20 more points for max happiness!"
 
     elif score > 20:
         path = "BPfour.png"
+        # bt1 = "Bean Happiness: 3/6"
+        bt2 = "Get 30 more points for max happiness!"
 
     elif score > 10:
         path = "BPthree.png"
+        # bt1 = "Bean Happiness: 2/6"
+        bt2 = "Get 40 more points for max happiness!"
 
     elif score > 5:
         path = "BPtwo.png"
+        # bt1 = "Bean Happiness: 1/6"
+        bt2 = "Get 45 more points for max happiness!"
 
     else:
         path = "BPone.png"
-
+        # bt1 = "Bean Happiness: 0/6"
+        bt2 = "Get 50 more points for max happiness!"
     # if (user_profile.score )
-    # print(user_profile.score)
+    # print(user_profile.score, path)
 
     base = Image.open(staticPath + path)
-    
+
     user_profile.render_bean_with_accessories(base) \
         .save(buffer := BytesIO(), "png")
     bean_str = base64.b64encode(buffer.getvalue())  \
@@ -457,7 +475,9 @@ def profile(request, username=None):
         'req_list' : friend_request_list,
         'friend_list' : friend_list,
         'mission_photos': mission_photos,
-        "bean_str" : bean_str
+        "bean_str" : bean_str,
+        # "bean_text_1" : bt1
+        "bean_text_2" : bt2
     };
 
     return render(request, 'WebApp/profile.html', context)

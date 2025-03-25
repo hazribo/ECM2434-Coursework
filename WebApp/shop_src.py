@@ -92,4 +92,3 @@ def shop_init():
         shItem.save()
         
         
-# shop_init()
