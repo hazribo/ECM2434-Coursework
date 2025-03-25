@@ -162,7 +162,7 @@ class Profile(models.Model):
                 )
                 shoeN += 1
 
-            if ("Hat" in accessoryObject.name):
+            if ("Hat" in accessoryObject.name or "Cap" in accessoryObject.name):
                 accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
                 offset = (
                     200 + hatN * 50,
