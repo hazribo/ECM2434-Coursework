@@ -10,7 +10,9 @@ from django.contrib.staticfiles import finders
 
 # TODO make seperate section for daily / other missions in missions.html
 
-# Code for user data:
+# ------------------------------------------------------
+# USER CLASS - HANDLES LOGIN DATA, ACCOUNT TYPE...
+# ------------------------------------------------------
 class User(AbstractUser):
     USER_TYPES = (
         ('player', 'Player'),
@@ -24,7 +26,6 @@ class User(AbstractUser):
     last_login_date = models.DateField(null=True, blank=True)
 
     def calc_login_streak(self):
-        profile, created = Profile.objects.get_or_create(user=self)
         today = localtime(now()).date()
 
         # Already logged in today - return as usual.
@@ -75,9 +76,43 @@ class User(AbstractUser):
             userData += (f'{key} = {fields[key]}\n')
         
         return userData
+    
 
+# Code for teams (user guilds/clans):
+class Team(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    team_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="led_teams")
+    members = models.ManyToManyField(User, related_name="teams", blank=True)
+    score = models.IntegerField(default=0)
 
-# Shop item class
+    # Join the team:
+    def add_member(self, user):
+        if user not in self.members.all():
+            self.members.add(user)
+            user.profile.team = self
+            print(self.members.all())
+            print(user.profile.team)
+            self.update_team()
+
+    # Remove a member from your team:
+    def remove_member(self, user):
+        if user in self.members.all():
+            self.members.remove(user)
+            user.profile.team = None
+            self.save()
+            self.update_team()
+
+    # Update the cumulative team score and DB:
+    def update_team(self):
+        self.score = sum(member.profile.score for member in self.members.all())
+        self.save()
+
+    def __str__(self):
+        return self.name
+
+# ------------------------------------------------------
+# SHOP CLASS - HANDLES ALL NAMES AND COSTS OF COSMETICS
+# ------------------------------------------------------
 class ShopItem(models.Model):
     pass;
 
@@ -87,36 +122,9 @@ class ShopItem(models.Model):
     def __str__(self) -> str:
         return f"(cosmetic) {self.name} ({self.cost} credits)"
 
-
-
-# Code for teams (user guilds/clans):
-class Team(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    team_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="led_teams")
-    members = models.ManyToManyField(User, related_name="teams", blank=True)
-    score = models.IntegerField(default=0)
-
-    # Invite a member to your team:
-    def add_member(self, user):
-        if user not in self.members.all():
-            self.members.add(user)
-            self.update_team_score()
-
-    # Remove a member from your team:
-    def remove_member(self, user):
-        if user in self.members.all():
-            self.members.remove(user)
-            self.update_team_score()
-
-    # Update the cumulative team score:
-    def update_team_score(self):
-        self.score = sum(member.profile.score for member in self.members.all())
-        self.save()
-
-    def __str__(self):
-        return self.name
-    
-# Code for user Profiles:
+# ------------------------------------------------------
+# PROFILE CLASS - HANDLES USER PROFILES & RELATED DATA
+# ------------------------------------------------------
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
@@ -134,7 +142,6 @@ class Profile(models.Model):
     credits = models.IntegerField(default=10)
 
     def render_bean_with_accessories(self):
-        
         path = finders.find("gbc3.png")
         staticPath = path[:len(path) - 8]
         base = Image.open(path)
@@ -144,40 +151,27 @@ class Profile(models.Model):
         shoeN = 0; hatN = 0
         
         for accessoryObject in self.inventory.all():
-
             accessoryImg = Image.open(staticPath + r"cosmetics/" + (accessoryObject.name + ".png"))
-
             offset = (0, 0)
 
             if ("Shoe" in accessoryObject.name or "Cap" in accessoryObject.name):
-                
                 accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
-                
                 offset = (
                     int(baseSize[0] / 2) - 200 + shoeN * 50,
                     int(baseSize[1] / 2) + 100 + shoeN * 50
                 )
-
                 shoeN += 1
 
             if ("Hat" in accessoryObject.name):
                 accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
-                
                 offset = (
                     200 + hatN * 50,
                     -100 + hatN * 50
                 )
-
                 hatN += 1
 
-
             base.paste(accessoryImg, offset, accessoryImg)
-
         return base
-
-
-
-
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -222,7 +216,9 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-# Code for missions:
+# ------------------------------------------------------
+# MISSION CLASSES - HANDLES ALL MISSION TYPES / SCENARIOS
+# ------------------------------------------------------
 class Mission(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()

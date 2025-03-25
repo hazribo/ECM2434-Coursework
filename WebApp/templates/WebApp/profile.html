@@ -1,90 +1,70 @@
 ﻿{% extends 'WebApp/game_base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
 {% block content %}
-
-<div class="profile-container">
-    <div class="profile-layout">
-        <div class="profile-left">
-            <div class="profile-picture">
+<div class="container main-content">
+    <div class="card shadow-lg p-4 mb-4 rounded" style="background-color: #e6f4ea;">
+        <div class="row align-items-center">
+            <!-- Profile Picture -->
+            <div class="col-md-4 text-center">
                 {% if profile.profile_picture %}
-                <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}'s Profile Picture" width="150">
+                <img src="{{ profile.profile_picture.url }}" class="rounded-circle border" style="width: 150px; height: 150px;" alt="{{ profile.user.username }}'s Profile Picture">
                 {% else %}
-                <p>No profile picture uploaded.</p>
+                <img src="{% static 'nopfp.png' %}" class="rounded-circle border" style="width: 150px; height: 150px;" alt="No Profile Picture">
+                {% endif %}
+                <h2 class="mt-3">{{ profile.user.username }}</h2>
+                <h4 class="text-muted">Score: {{ profile.score }}</h4>
+            </div>
+
+            <!-- Bio Section -->
+            <div class="col-md-8">
+                <h3>Bio:</h3>
+                <p class="border rounded p-3 bg-light">{{ profile.bio|default:"No bio provided." }}</p>
+                {% if request.user == profile.user %}
+                <a href="{% url 'profile_update' %}" class="btn btn-primary">Edit Profile</a>
                 {% endif %}
             </div>
-
-            <div class="profile-name">
-                <h2>{{ profile.user.username }}</h2>
-            </div>
-
-            <div class="profile-score">
-                <h3>Score: {{ profile.score }}</h3>
-            </div>
-        </div>
-
-        <div class="profile-right">
-            <div class="bio">
-                <h3>Bio:</h3>
-                <p>{{ profile.bio|default:"No bio provided." }}</p>
-            </div>
         </div>
     </div>
 
-    <!-- Allow user to edit their own profile: -->
-    {% if request.user == profile.user %}
-    <div class="edit-profile-button">
-        <a href="{% url 'profile_update' %}" class="btn btn-primary">Edit Profile</a>
+    <!-- Friend Requests -->
+    {% if request.user == profile.user and req_list %}
+    <div class="card shadow-lg p-4 mb-4 rounded">
+        <h3>Friend Requests</h3>
+        <ul class="list-unstyled">
+            {% for reqProfile in req_list %}
+            <li class="d-flex align-items-center mb-3">
+                <img src="{% if reqProfile.hasPfp %}{{ reqProfile.pfpUrl }}{% else %}{% static 'nopfp.png' %}{% endif %}" class="me-2" style="width: 50px; height: 50px;">
+                <a href="{{ reqProfile.link }}" class="me-3">{{ reqProfile.name }}</a>
+                <form action="{{ reqProfile.acceptURL }}" class="me-2">
+                    <button class="btn btn-success btn-sm friend-accept-button">✔ Accept</button>
+                </form>
+                <form action="{{ reqProfile.rejectURL }}">
+                    <button class="btn btn-danger btn-sm friend-reject-button">✖ Reject</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
     {% endif %}
-</div>
 
-{% if request.user == profile.user %}
-
-<div class="friend_req_div">
-
-    <h2>friend requests</h2>
-
-
-    {% for reqProfile in req_list %}
-
-    {% if reqProfile.hasPfp %}
-    <img class="pfp_thumbnail" src={{ reqProfile.pfpUrl }} />
-    {% else %}
-    <img class="pfp_thumbnail" src={% static 'nopfp.png' %} />
-    {% endif %}
-    <a href={{ reqProfile.link }}>{{ reqProfile.name }}</a>
-
-    <div>
-        <form action={{ reqProfile.acceptURL }}>
-            <button class="friend_accept_button" id={{ reqProfile.name }} type="submit">accept</button>
-        </form>
-        <form action={{ reqProfile.rejectURL }}>
-            <button class="friend_reject_button" id={{ reqProfile.name }} type="submit">reject</button>
-        </form>
+    <!-- Friends List -->
+    <div class="card shadow-lg p-4 mb-4 rounded">
+        <h3>Friends</h3>
+        <ul class="list-unstyled d-flex flex-wrap gap-3">
+            {% for friendProfile in friend_list %}
+            <li class="d-flex align-items-center">
+                <img src="{% if friendProfile.hasPfp %}{{ friendProfile.pfpUrl }}{% else %}{% static 'nopfp.png' %}{% endif %}" class="me-2" style="width: 50px; height: 50px;">
+                <a href="{{ friendProfile.link }}">{{ friendProfile.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 
-    {% endfor %}
-
-
-</div>
-
-{% endif %}
-
-<div class="friend_list_div">
-    <h2>friends</h2>
-
-    {% for friendProfile in friend_list %}
-
-    <div>
-        {% if friendProfile.hasPfp %}
-        <img class="pfp_thumbnail" src={{ friendProfile.pfpUrl }} />
-        {% else %}
-        <img class="pfp_thumbnail" src={% static 'nopfp.png' %} />
-        {% endif %}
-        <a href={{ friendProfile.link }}>{{ friendProfile.name }}</a>
+    <!-- Pet Section -->
+    <div class="text-center mb-4">
+        <h3>Your Pet!</h3>
+        <img src="{% static 'gbc3.png' %}" alt="Bean" width="250" class="border rounded">
     </div>
 
     {% endfor %}
@@ -93,12 +73,47 @@
 </div>
 
 
-<div class="container main-content">
+<div class="col mt-2"><div class="character-box rounded-box">
     <h1 style="text-align: center;">Your Pet!</h1>
     <div style="text-align: center;">
+<<<<<<< HEAD
         <img src="data:image/png;base64,{{bean_str}}" alt="Bean" width="250" height="250" />
+=======
+        {% if profile.score > 40 %}
+        <img src="{% static 'BPsix.png' %}" alt="Bean" width="250" height="250" />
+        {% elif profile.score == 40 %}
+        <img src="{% static 'BPfive.png' %}" alt="Bean" width="250" height="250" />
+        {% elif profile.score == 30 %}
+        <img src="{% static 'BPfour.png' %}" alt="Bean" width="250" height="250" />
+        {% elif profile.score == 20 %}
+        <img src="{% static 'BPthree.png' %}" alt="Bean" width="250" height="250" />
+        {% elif profile.score == 10 %}
+        <img src="{% static 'BPtwo.png' %}" alt="Bean" width="250" height="250" />
+        {% else %}
+        <img src="{% static 'BPone.png' %}" alt="Bean" width="250" height="250" />
+        {% endif %}
+>>>>>>> origin
     </div>
-</div>
+        {% if profile.score > 40 %}
+        <p style="text-align: center;">Bean Happiness: 6/6 </p>
+        <p style="text-align: center;">Your bean is at full happiness! </p>
+        {% elif profile.score == 40 %}
+        <p style="text-align: center;">Bean Happiness: 5/6 </p>
+        <p style="text-align: center;">Get 10 more points for max happiness! </p>
+        {% elif profile.score == 30 %}
+        <p style="text-align: center;">Bean Happiness: 4/6 </p>
+        <p style="text-align: center;">Get 20 more points for max happiness! </p>
+        {% elif profile.score == 20 %}
+        <p style="text-align: center;">Bean Happiness: 3/6 </p>
+        <p style="text-align: center;">Get 30 more points for max happiness! </p>
+        {% elif profile.score == 10 %}
+        <p style="text-align: center;">Bean Happiness: 2/6 </p>
+        <p style="text-align: center;">Get 40 more points for max happiness! </p>
+        {% else %}
+        <p style="text-align: center;">Bean Happiness: 1/6 </p>
+        <p style="text-align: center;">Get 50 more points for max happiness! </p>
+        {% endif %}
+</div></div>
 
 <!-- To show all a user's images on their profile: -->
 <div class="image-gallery-container">
@@ -108,12 +123,10 @@
         <div class="image-box">
             <img src="{{ image.image.url }}" alt="User Image">
         </div>
-        {% empty %}
-        <p>No images uploaded.</p>
-        {% endfor %}
     </div>
 </div>
 
+<<<<<<< HEAD
 <form action="datareq">
 
     <a href="userdata.txt" download>
@@ -121,22 +134,24 @@
 </form>
 
 
+=======
+<!-- JavaScript for Buttons -->
+>>>>>>> origin
 <script>
-
-    for (let button of document.getElementsByClassName("friend_reject_button")) {
-        button.addEventListener("click", function () {
-            button.innerHTML = "✔";
-            //window.alert("rejected friend request from " + button.id);
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".friend-reject-button").forEach(button => {
+            button.addEventListener("click", function () {
+                button.innerHTML = "✔ Rejected";
+                button.disabled = true;
+            });
         });
-    }
-
-    for (let button of document.getElementsByClassName("friend_accept_button")) {
-        button.addEventListener("click", function () {
-            button.innerHTML = "✔";
-            //window.alert("accepted friend request from " + button.id);
+        document.querySelectorAll(".friend-accept-button").forEach(button => {
+            button.addEventListener("click", function () {
+                button.innerHTML = "✔ Accepted";
+                button.disabled = true;
+            });
         });
-    }
-
+    });
 </script>
 
 <style>
@@ -268,7 +283,24 @@
         margin-top: 20px;
         text-align: center;
     }
+<<<<<<< HEAD
 
+=======
+    .rounded-box {
+        border-radius: 5px;
+        box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: auto;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        color: white;
+    }
+    .character-box {
+        max-width: 400px;
+        background-color: #548eb3;
+    }
+>>>>>>> origin
     .image-gallery-container {
         margin-top: 20px;
         text-align: center;
