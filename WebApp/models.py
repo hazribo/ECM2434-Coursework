@@ -92,6 +92,7 @@ class Team(models.Model):
             user.profile.team = self
             print(self.members.all())
             print(user.profile.team)
+            user.profile.save()
             self.update_team()
 
     # Remove a member from your team:
@@ -99,6 +100,7 @@ class Team(models.Model):
         if user in self.members.all():
             self.members.remove(user)
             user.profile.team = None
+            user.profile.save()
             self.save()
             self.update_team()
 
