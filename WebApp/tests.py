@@ -38,7 +38,7 @@ class UserModelTest(TestCase):
 
 class UserLoginStreakTest(TestCase):
     # Generate user for test purposes:
-    def setUp(self):
+    def setup(self):
         self.user = User.objects.create_user(username='testuser2', password='testpass123', user_type='player')
         self.profile = Profile.objects.get(user=self.user)
 
@@ -120,7 +120,7 @@ class UserLoginStreakTest(TestCase):
 
 class TeamModelTest(TestCase):
     # Generate 2 users & team for test purposes:
-    def setUp(self):
+    def setup(self):
         self.user1 = User.objects.create_user(username='user1', password='password123') # user 1 created to be owner of test team.
         self.user2 = User.objects.create_user(username='user2', password='password123') # user 2 created to join/leave team.
         self.team = Team.objects.create(name='Test Team', team_owner=self.user1)
@@ -138,7 +138,7 @@ class TeamModelTest(TestCase):
 
 class MissionModelTest(TestCase):
     # Generate user and mission for test purposes:
-    def setUp(self):
+    def setup(self):
         self.user = User.objects.create_user(username='missionuser', password='password123')
         self.mission = Mission.objects.create(name='Test Mission', points=10, mission_type='daily')
 
@@ -161,7 +161,7 @@ class MissionModelTest(TestCase):
 
 class MissionPhotoModelTest(TestCase):
     # Generate user, profile, and mission for test purposes:
-    def setUp(self):
+    def setup(self):
         self.user = User.objects.create_user(username='photouser', password='password123')
         self.profile = self.user.profile
         self.mission = Mission.objects.create(name='Photo Mission', points=20)
@@ -283,7 +283,7 @@ class ProfileUpdateFormTest(TestCase):
 # response code 200 = success.
 class ViewTests(TestCase):
     # Initialise test user, test profile:
-    def setUp(self):
+    def setup(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='testpass123', user_type='player')
         self.profile = Profile.objects.get(user=self.user)
