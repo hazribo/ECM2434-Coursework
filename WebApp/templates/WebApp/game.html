@@ -5,11 +5,21 @@
     <!-- Top Section -->
     <p class="text-center">Currently logged in user: {{ profile.user.username }}</p>
     <div class="row mt-4 text-center justify-content-between">
+<<<<<<< HEAD
+        <div class="col">
+            <a href="https://www.exeter.ac.uk/about/sustainability/" class="link rounded-box button-link clickable">
+                Link to Exeter University climate policy 
+            </a>
+             
+            <!-- uni link -->
+        </div>
+=======
         <div class="col"><div class="link rounded-box">
             <a href="{% url 'policy' %}" class="link rounded-box button-link clickable">
                 University Climate Policy
             </a>
         </div></div>
+>>>>>>> origin
         <div class="col offset-md-6">
             <a href="{% url 'leaderboard' %}" class="link rounded-box button-link clickable">
                 Leaderboard
@@ -20,11 +30,11 @@
     <!-- Middle Section -->
     <div class="row mt-4 text-center">
         <!-- Mission Section -->
-        <div class="col mt-2"><div class="box rounded-box">
-            <a href="{% url 'missions' %}" class="link button-link clickable">
+        <div class="col mt-2">
+            <a href="{% url 'missions' %}" class="link rounded-box button-link clickable">
                 Missions
             </a>
-        </div></div>
+        </div>
         <!-- Pet Section -->
         <div class="col mt-2"><div class="character-box rounded-box">
             <h4>Feed Your Pet!</h4>
