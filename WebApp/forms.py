@@ -9,6 +9,9 @@ from .models import *
         </form>
 '''
 
+# ------------------------------------------------------
+# User Registration - for register.html
+# ------------------------------------------------------
 class UserRegistrationForm(UserCreationForm):
     user_type = forms.ChoiceField(choices=User.USER_TYPES)
 
@@ -32,6 +35,9 @@ class UserRegistrationForm(UserCreationForm):
         self.fields['password2'].help_text = ''
         self.fields['user_type'].help_text = 'DEV SETTING - REMOVE FROM OFFICIAL RELEASE.'
 
+# ------------------------------------------------------
+# Profile Update - for changing bio, profile pic
+# ------------------------------------------------------
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -48,6 +54,9 @@ class ProfileUpdateForm(forms.ModelForm):
         self.fields['bio'].help_text = 'Write a short bio about yourself.'
         self.fields['profile_picture'].help_text = 'Upload a profile picture.'
 
+# ------------------------------------------------------
+# Mission form - for creating/managing missions (GK/Dev)
+# ------------------------------------------------------
 class MissionForm(forms.ModelForm):
     class Meta:
         model = Mission

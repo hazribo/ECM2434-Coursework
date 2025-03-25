@@ -1,12 +1,22 @@
+<<<<<<< HEAD
 import django
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.http import FileResponse, HttpResponse, JsonResponse, HttpResponseRedirect
 from django.utils import timezone
+=======
+# Django imports:
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.http import JsonResponse, HttpResponseRedirect
+>>>>>>> origin
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import call_command
+# json for status responses:
 import json
+# Import necessary local files:
 from .models import *
 from .forms import *
 from .leaderboard_src import *
@@ -16,8 +26,6 @@ from .missions_src import get_user_missions, tick_repeating_missions
 from .shop_src import get_shop_items, user_buy, get_inventory_items, shop_init
 # geopy for location views:
 from geopy.distance import geodesic
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
 from time import time as getNow
 # image for photo saving:
 from PIL import Image
@@ -26,6 +34,7 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from os import remove
 
+<<<<<<< HEAD
 def getTimeNow(): return getNow()
 
 # Friend system code:
@@ -54,10 +63,94 @@ def reject_req(request, rejecter_id, rejected_id, **kwargs):
     return unchanged(request)
 
 # Helper functions for user roles/permissions:
+=======
+# ------------------------------------------------------
+# Helper Functions for Permissions:
+# ------------------------------------------------------
+>>>>>>> origin
 def is_game_keeper_or_developer(user):
     return user.user_type in ['game_keeper', 'developer']
 def is_developer(user):
     return user.user_type == 'developer'
+
+# ------------------------------------------------------
+# Basic render request functions for home/about:
+# ------------------------------------------------------
+
+def home(request):
+    return render(request, 'WebApp/home.html')
+
+def about(request):
+    return render(request, 'WebApp/about.html')
+
+def policy(request):
+    return render(request, 'WebApp/policy.html')
+
+# ------------------------------------------------------
+# User Authentication:
+# ------------------------------------------------------
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')  # Redirect to home page
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'WebApp/register.html', {'form': form})
+
+def user_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')  # Redirect to home page
+    else:
+        form = AuthenticationForm()
+    return render(request, 'WebApp/login.html', {'form': form})
+
+def user_logout(request):
+    logout(request)
+    return redirect('login')
+
+# ------------------------------------------------------
+# Friends System:
+# ------------------------------------------------------
+
+def unchanged(request, *args, **kwargs):
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+# Handles user accepting friend request:
+def accept_req(request, accepter_id, accepted_id, **kwargs):
+    print(f"Accept Request: {accepter_id} is accepting {accepted_id}")
+    record_friend_request_response(accepter_id, accepted_id, True)
+    return unchanged(request)
+
+# Handles user rejecting friend request:
+def reject_req(request, rejecter_id, rejected_id, **kwargs):
+    print(f"Reject Request: {rejecter_id} is rejecting {rejected_id}")
+    record_friend_request_response(rejecter_id, rejected_id, False)
+    return unchanged(request)
+
+# Handles user sending friend request (requires login):
+@login_required
+def addfriend(request, idVal = None):
+    send_friend_request(request.user.id, idVal)
+    return unchanged(request);
+
+# ------------------------------------------------------
+# Missions Code:
+# ------------------------------------------------------
+
+# Gets current time/date:
+def getTimeNow(): 
+    return getNow()
 
 # For adding/deleting missions (must be GK or Dev):
 @login_required
@@ -95,19 +188,17 @@ def manage_missions(request):
 # Mission management:
 @login_required
 def missions(request):
+    username=request.user.username
     ACCEPTABLE_DISTANCE = 100 # Acceptable distance from mission location - feel free to edit to debug.
     # Generate default missions if none exist:
     if not Mission.objects.exists():
         call_command('generate_missions')
-
-    username=request.user.username
         
     # Get data for provided username to display correct profile:
     user = get_object_or_404(User, username=username)
     user_profile = get_object_or_404(Profile, user=user)
-
+    team = user_profile.team
     tick_repeating_missions(user_profile);
-
 
     # Handle POST request (on mission completion):
     if request.method == "POST":
@@ -116,27 +207,20 @@ def missions(request):
             mission_id = data.get("mission_id")
             latitude = data.get("latitude")
             longitude = data.get("longitude")
-
             mission = get_object_or_404(Mission, id=mission_id)
             user_mission, created = UserMission.objects.get_or_create(user=request.user, mission=mission)
 
             # Checks if mission is location-based:
             if mission.requires_location:
+                # Error handling - no location data:
                 if latitude is None or longitude is None:
-                    return JsonResponse({
-                        "status": "error",
-                        "message": "Location data is missing."
-                    })
-
+                    return JsonResponse({"status": "error", "message": "Location data is missing."})
                 try:
                     latitude = float(latitude)
                     longitude = float(longitude)
                 except ValueError:
-                    return JsonResponse({
-                        "status": "error",
-                        "message": "Invalid location coordinates."
-                    })
-
+                    return JsonResponse({"status": "error", "message": "Invalid location coordinates."})
+                
                 # Calculate distance from target location:
                 mission_location = (mission.latitude, mission.longitude)
                 user_location = (latitude, longitude)
@@ -146,28 +230,16 @@ def missions(request):
                 if distance <= ACCEPTABLE_DISTANCE:
                     # As long as in range, mission completed...
                     user_mission.completed = True
-                    if (user_mission.completed):
-                        user_mission.date_completed = getTimeNow();
+                    user_mission.date_completed = getTimeNow();
                     user_mission.save()
-
                     # ...and points awarded:
                     profile = request.user.profile
                     profile.score += mission.points
+                    if team:
+                        team.score += mission.points
                     profile.save()
-
-                    return JsonResponse({
-                        "status": "success",
-                        "requires_location": True,
-                        "location_verified": True,
-                        "distance": distance
-                    })
-                else:
-                    return JsonResponse({
-                        "status": "success",
-                        "requires_location": True,
-                        "location_verified": False,
-                        "distance": distance
-                    })
+                # Return completion status for location_verified:
+                return JsonResponse({"status": "success", "requires_location": True, "location_verified": user_mission.completed, "distance": distance})
 
             # Handle self-check missions (such as recycling):
             else:
@@ -180,36 +252,37 @@ def missions(request):
                 profile = request.user.profile
                 if user_mission.completed:
                     profile.score += mission.points
+<<<<<<< HEAD
                     profile.credits += 1
                 else:
                     profile.score -= mission.points
                     profile.credits -= 1
                 
+=======
+                    if team:
+                        team.score += mission.points
+                else: # Debug - in case of undo:
+                    profile.score -= mission.points
+                    if team:
+                        team.score -= mission.points
+>>>>>>> origin
                 profile.save()
-
-                return JsonResponse({
-                    "status": "success",
-                    "requires_location": False,
-                    "completed": user_mission.completed
-                })
-
+                # Return state of user_mission.completed:
+                return JsonResponse({"status": "success", "requires_location": False, "completed": user_mission.completed})
+        # Send error if JSON format incorrect:
         except json.JSONDecodeError:
-            return JsonResponse({
-                "status": "error",
-                "message": "Invalid JSON format."
-            })
+            return JsonResponse({"status": "error", "message": "Invalid JSON format."})
 
     # Ensure all missions are tracked in UserMission:
     all_missions = Mission.objects.all()
     user_missions = UserMission.objects.filter(user=request.user)
 
+    # Get/Create missions in user's missions list:
     for mission in all_missions:
         UserMission.objects.get_or_create(user=request.user, mission=mission)
 
-    return render(request, 'WebApp/missions.html', {
-        'missions': all_missions,
-        'user_missions': user_missions
-    })
+    # Render missions.html, along with all user's mission data:
+    return render(request, 'WebApp/missions.html', {'missions': all_missions, 'user_missions': user_missions})
 
 @login_required
 def save_photo(request):
@@ -219,17 +292,15 @@ def save_photo(request):
             data = json.loads(request.body)
             image_data = data.get('image_data')  
             mission_id = data.get('mission_id')
-
+            # Error; in case of no image data present:
             if not image_data:
                 return JsonResponse({'status': 'error', 'message': 'No image data received'})
 
             # Extract the base64 string:
             format, imgstr = image_data.split(';base64,')
             imgdata = base64.b64decode(imgstr)
-
             # Convert image to a file-like object:
             image_file = ContentFile(imgdata, name=f"{request.user.username}_mission_{mission_id}.jpg")
-
             # Open image with PIL:
             image = Image.open(BytesIO(imgdata))
             image.verify()  # Verifies no corrupted image.
@@ -240,24 +311,22 @@ def save_photo(request):
             # Get the mission:
             try:
                 mission = Mission.objects.get(id=mission_id)
+            # Error; no mission exists with given mission_id:
             except Mission.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Invalid mission ID'})
 
             # Save photo to MissionPhoto model:
             MissionPhoto.objects.create(profile=profile, mission=mission, image=image_file)
-
             return JsonResponse({'status': 'success', 'message': 'Photo saved successfully'})
 
+        # Catch-all for all other possible errors:
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
-
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
-def home(request):
-    return render(request, 'WebApp/home.html')
-
-def about(request):
-    return render(request, 'WebApp/about.html')
+# ------------------------------------------------------
+# Game page code:
+# ------------------------------------------------------
 
 
 @login_required
@@ -345,12 +414,12 @@ def game(request):
     }
     return render(request, 'WebApp/game.html', context)
 
-@login_required
-def addfriend(request, idVal = None):
-    send_friend_request(request.user.id, idVal)
-    return unchanged(request);
+# ------------------------------------------------------
+# Search results view:
+# ------------------------------------------------------
 
 def search(request):
+    _NoSearchString = "NONE"
     username = request.GET.get('username', _NoSearchString)
     matches = search_for_username(username)
     context = { 
@@ -360,6 +429,7 @@ def search(request):
     }
     return render(request, "WebApp/search.html", context)
 
+<<<<<<< HEAD
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -372,34 +442,26 @@ def register(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'WebApp/register.html', {'form': form})
+=======
+# ------------------------------------------------------
+# Leaderboard view:
+# ------------------------------------------------------
+>>>>>>> origin
 
-def user_login(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('home')  # Redirect to home page
-    else:
-        form = AuthenticationForm()
-    return render(request, 'WebApp/login.html', {'form': form})
-
-def user_logout(request):
-    logout(request)
-    return redirect('login')
-
-def leaderboard(request): 
+def leaderboard(request):
+    # Get all leaderboard visual data:
     leaderboard_type = request.GET.get('type', 'users')
     limit = request.GET.get('range', '10')
     range_map = {"10": 10, "50": 50, "100": 100, "all": None}
     limit = range_map.get(limit, 10)
-
+    # Retrieve data from profile/team scores db:
     data = get_leaderboard_data(leaderboard_type, limit)
-
+    # Return data to leaderboard.html:
     return render(request, 'WebApp/leaderboard.html', data)
+
+# ------------------------------------------------------
+# User profiles:
+# ------------------------------------------------------
 
 @login_required
 def profile(request, username=None):
@@ -421,6 +483,9 @@ def profile(request, username=None):
     # Get the friend / friend request list for this profile:
     friend_request_list = get_friend_request_list(user_profile);
     friend_list = get_friend_list(user_profile)
+    # Debug - print these:
+    print(friend_request_list)
+    print(friend_list)
 
 
     
@@ -437,36 +502,7 @@ def profile(request, username=None):
 
     return render(request, 'WebApp/profile.html', context)
 
-# Code for teams:
-@login_required
-def manage_teams(request):
-    user = request.user
-    teams = Team.objects.all()
-    user_team = user.profile.team if hasattr(user, "profile") else None
-
-    if request.method == "POST":
-        action = request.POST.get("action")
-        team_id = request.POST.get("team_id")
-        
-        if action == "create":
-            name = request.POST.get("name")
-            if name:
-                team = Team.objects.create(name=name, team_owner=user)
-                team.add_member(user)
-                return redirect("teams")
-
-        elif action == "join" and team_id:
-            team = get_object_or_404(Team, id=team_id)
-            team.add_member(user)
-            return redirect("teams")
-
-        elif action == "leave" and user_team:
-            user_team.remove_member(user)
-            return redirect("teams")
-
-    return render(request, "WebApp/teams.html", {"teams": teams, "user_team": user_team})
-
-
+# Profile update form request:
 @login_required
 def profile_update(request):
     if request.method == 'POST':
@@ -478,13 +514,47 @@ def profile_update(request):
         form = ProfileUpdateForm(instance=request.user.profile)
     return render(request, 'WebApp/profile_update.html', {'form': form})
 
+# Redirects user to their profile or login page if not logged in:
 def redirect_to_profile(request):
     if request.user.is_authenticated:
         return redirect('profile', username=request.user.username)
     else:
         # redirect to login if not logged in - no profile to show:
         return redirect('login')
+    
+# ------------------------------------------------------
+# Teams Code:
+# ------------------------------------------------------
 
-@user_passes_test(is_developer)
-def developer_dashboard(request):
-    return render(request, 'accounts/developer_dashboard.html')
+@login_required
+def manage_teams(request):
+    # Initialise user, team, user_team:
+    user = request.user
+    teams = Team.objects.all()
+    user_team = Team.objects.filter(members=user).first()
+
+    if request.method == "POST":
+        # Get action type, team_id:
+        action = request.POST.get("action")
+        team_id = request.POST.get("team_id")
+        
+        # Team creation handling:
+        if action == "create":
+            name = request.POST.get("name")
+            if name:
+                # Create team, add user to team:
+                team = Team.objects.create(name=name, team_owner=user)
+                team.add_member(user)
+                return redirect("teams")
+        # Team joining handling:
+        elif action == "join" and team_id:
+            team = get_object_or_404(Team, id=team_id)
+            team.add_member(user)
+            return redirect("teams")
+        # Team leaving handling:
+        elif action == "leave" and user_team:
+            user_team.remove_member(user)
+            user_team = None
+            return redirect("teams")
+
+    return render(request, "WebApp/teams.html", {"teams": teams, "user_team": user_team})

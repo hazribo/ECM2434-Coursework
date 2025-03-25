@@ -1,41 +1,37 @@
 ﻿{% extends 'WebApp/game_base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
 {% block content %}
-<h1>Search results for {{ search_name }}:</h1>
+<div class="container main-content">
+    <h1 class="text-center text-white bg-success rounded p-4 mb-4">Search Results for "{{ search_name }}"</h1>
 
-{% if not anyfound %}
-<h3>*Nothing found*</h3>
-{% endif %}
+    {% if not anyfound %}
+    <h3 class="text-center text-danger">*No users found*</h3>
+    {% endif %}
 
-<ul>
-    {% for User in results %}
-    <li>
-        {% if User.has_profile_pic %}
-        <img src={{ User.profile_picture_path }}
-             style="width:50px;height:50px;" />
-        {% else %}
-        <img src={% static 'nopfp.png' %}
-             style="width:50px;height:50px;" />
-        {% endif %}
-        <a href={{ User.link }}>{{ User.username }}</a>
+    <ul class="list-unstyled">
+        {% for User in results %}
+        <li class="card p-3 mb-3 shadow-lg d-flex flex-row align-items-center" style="background-color: #e6f4ea; border-radius: 15px;">
+            <!-- Profile Picture -->
+            <img src="{% if User.has_profile_pic %}{{ User.profile_picture_path }}{% else %}{% static 'nopfp.png' %}{% endif %}"
+                 class="me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ User.username }}'s profile picture">
+            
+            <!-- User Info -->
+            <div class="flex-grow-1">
+                <h5 class="mb-0"><a href="{{ User.link }}" class="text-success text-decoration-none">{{ User.username }}</a></h5>
+            </div>
 
-        <!--<form action={{ User.idVal }} id={{ User.idVal }}>
-        <button class="friend_add_button" type="submit">+</button>
-        </form>-->
+            <!-- Friend Request Button -->
+            <form action={{ User.idVal }}>
+                <button class="friend_add_button btn btn-success btn-sm clickable"  id={{ User.username }} type="submit">+</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
-        <form action={{ User.idVal }}>
-            <button class="friend_add_button"  id={{ User.username }} type="submit">+</button>
-        </form>
-
-    </li>
-    {% endfor %}
-</ul>
-
+<!-- JavaScript -->
 <script>
-
     let buttons = document.getElementsByClassName("friend_add_button");
     for (let button of buttons) {
         button.addEventListener("click", function () {
@@ -43,33 +39,6 @@
             window.alert("sent friend request to " + button.id);
         });
     }
-    
-
 </script>
 
-<style>
-    .friend_add_button {
-        -webkit-border-radius: 6px;
-        -moz-border-radius: 6px;
-        border-radius: 6px;
-        font-family: Georgia;
-        color: #000000;
-        font-size: 16px;
-        background: #45de1b;
-        padding: 2px 4px 4px 4px;
-        border: solid #1f5e00 3px;
-        text-decoration: none;
-    }
-        .friend_add_button:hover {
-            background: #36ab16;
-            text-decoration: none;
-        }
-        .friend_add_button:active {
-            background: #a4db95;
-            text-decoration: none;
-        }
-
-</style>
-
 {% endblock %}
-</html>
