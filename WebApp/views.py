@@ -475,10 +475,43 @@ def profile(request, username=None):
     print(friend_request_list)
     print(friend_list)
 
+    base = None
 
+    pathTemp = finders.find("gbc3.png")
+    staticPath = pathTemp[:len(pathTemp) - 8]
+
+    score = user_profile.score
+
+    if score > 50:
+        path = "gbc3.png"
+
+    elif score > 40:
+        path = "BPsix.png"
+
+    elif score > 30:
+        path = "BPfive.png"
+
+    elif score > 20:
+        path = "BPfour.png"
+
+    elif score > 10:
+        path = "BPthree.png"
+
+    elif score > 5:
+        path = "BPtwo.png"
+
+    else:
+        path = "BPone.png"
+
+    # if (user_profile.score )
+    # print(user_profile.score)
+
+    base = Image.open(staticPath + path)
     
-    user_profile.render_bean_with_accessories().save(buffer := BytesIO(), "png")
-    bean_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    user_profile.render_bean_with_accessories(base) \
+        .save(buffer := BytesIO(), "png")
+    bean_str = base64.b64encode(buffer.getvalue())  \
+        .decode('utf-8')
 
     context = {
         'profile': user_profile,

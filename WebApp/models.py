@@ -141,10 +141,10 @@ class Profile(models.Model):
 
     credits = models.IntegerField(default=10)
 
-    def render_bean_with_accessories(self):
+    def render_bean_with_accessories(self, base):
         path = finders.find("gbc3.png")
         staticPath = path[:len(path) - 8]
-        base = Image.open(path)
+        # base = Image.open(path)
 
         baseSize = base.size
 
@@ -155,22 +155,25 @@ class Profile(models.Model):
             offset = (0, 0)
 
             if ("Shoe" in accessoryObject.name or "Cap" in accessoryObject.name):
-                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+                accessoryImg = accessoryImg.resize((128, 128), Image.Resampling.LANCZOS)
                 offset = (
-                    int(baseSize[0] / 2) - 200 + shoeN * 50,
-                    int(baseSize[1] / 2) + 100 + shoeN * 50
+                    int(baseSize[0] / 2) - 20 + shoeN * 5,
+                    int(baseSize[1] / 2) + 30 + shoeN * 5
                 )
                 shoeN += 1
 
             if ("Hat" in accessoryObject.name or "Cap" in accessoryObject.name):
-                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+                accessoryImg = accessoryImg.resize((128, 128), Image.Resampling.LANCZOS)
                 offset = (
-                    200 + hatN * 50,
-                    -100 + hatN * 50
+                    100 + hatN * 5,
+                    -60 + hatN * 5
                 )
                 hatN += 1
 
             base.paste(accessoryImg, offset, accessoryImg)
+        
+        # base.show()
+            
         return base
 
     def __str__(self):
