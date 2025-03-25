@@ -41,6 +41,9 @@ def home(request):
 def about(request):
     return render(request, 'WebApp/about.html')
 
+def policy(request):
+    return render(request, 'WebApp/policy.html')
+
 # ------------------------------------------------------
 # User Authentication:
 # ------------------------------------------------------
