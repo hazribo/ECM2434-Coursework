@@ -1,8 +1,17 @@
+<<<<<<< HEAD
+import django
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.http import FileResponse, HttpResponse, JsonResponse, HttpResponseRedirect
+from django.utils import timezone
+=======
 # Django imports:
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.http import JsonResponse, HttpResponseRedirect
+>>>>>>> origin
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.management import call_command
 # json for status responses:
@@ -14,6 +23,7 @@ from .leaderboard_src import *
 from .search_src import search_for_username
 from .friendsystem_src import *
 from .missions_src import get_user_missions, tick_repeating_missions
+from .shop_src import get_shop_items, user_buy, get_inventory_items, shop_init
 # geopy for location views:
 from geopy.distance import geodesic
 from time import time as getNow
@@ -22,10 +32,42 @@ from PIL import Image
 import base64
 from io import BytesIO
 from django.core.files.base import ContentFile
+from os import remove
 
+<<<<<<< HEAD
+def getTimeNow(): return getNow()
+
+# Friend system code:
+_IGNORE_PASSWORD_REQS = False
+_NoSearchString = "NONE"
+
+_GDPR_RETURN_FILE_NAME = "userdata"
+
+def _get_user_data(request):
+    user = request.user
+    user_profile = get_object_or_404(Profile, user=user)
+
+    return user, user_profile
+
+# returned by view function in order to not change the page
+# active at all
+def unchanged(request, *args, **kwargs):
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+def accept_req(request, accepter_id, accepted_id, **kwargs):
+    record_friend_request_response(accepter_id, accepted_id, True)
+    return unchanged(request)
+
+def reject_req(request, rejecter_id, rejected_id, **kwargs):
+    record_friend_request_response(rejecter_id, rejected_id, False)
+    return unchanged(request)
+
+# Helper functions for user roles/permissions:
+=======
 # ------------------------------------------------------
 # Helper Functions for Permissions:
 # ------------------------------------------------------
+>>>>>>> origin
 def is_game_keeper_or_developer(user):
     return user.user_type in ['game_keeper', 'developer']
 def is_developer(user):
@@ -210,12 +252,20 @@ def missions(request):
                 profile = request.user.profile
                 if user_mission.completed:
                     profile.score += mission.points
+<<<<<<< HEAD
+                    profile.credits += 1
+                else:
+                    profile.score -= mission.points
+                    profile.credits -= 1
+                
+=======
                     if team:
                         team.score += mission.points
                 else: # Debug - in case of undo:
                     profile.score -= mission.points
                     if team:
                         team.score -= mission.points
+>>>>>>> origin
                 profile.save()
                 # Return state of user_mission.completed:
                 return JsonResponse({"status": "success", "requires_location": False, "completed": user_mission.completed})
@@ -278,6 +328,77 @@ def save_photo(request):
 # Game page code:
 # ------------------------------------------------------
 
+
+@login_required
+def datareq(request, username):
+    _, profile = _get_user_data(request)
+    
+    userData = profile.get_GDPR_data()
+    pfpData = profile.get_pfp()
+
+    pfpData = "\n" + str(pfpData if pfpData is None else 
+                         [item for item in pfpData.getdata()]) 
+
+    # proper way, force file download
+    response = HttpResponse(userData + str(pfpData), content_type="application/text charset=utf-8");
+    response["Content-Disposition"] = f"attatchment; filename={_GDPR_RETURN_FILE_NAME}.txt"
+
+    return response
+
+
+    # gives data to browser directly as file response, 
+    # makes browser choose how to display data (inconsistent)
+
+    # f = open("userdata.txt", "w+")
+
+    # for key in profileDataFields:
+    #     f.write(f'{key} = {profileDataFields[key]}\n')
+    # for key in userDataFields:
+    #     f.write(f'{key} = {userDataFields[key]}\n')
+
+    # f.close()
+
+
+    # # return alert(request, "started download");
+    # return FileResponse(open("userdata.txt", "rb"), filename="userdata.txt")
+
+
+
+
+
+
+
+def alert(request, message):
+    return render(request, "WebApp/alert.html", {"message" : message})
+
+@login_required
+def buy_shop(request, itemname):
+    
+    _, profile = _get_user_data(request)
+
+    if user_buy(profile, itemname):
+        # enough 
+        return unchanged(request)
+    else:
+        # not enough credits
+        return alert(request, "not enough credits");
+    
+
+@login_required
+def shop(request):
+
+    shop_init()
+
+    _, profile = _get_user_data(request)
+
+    context = {
+        "shop_items" : get_shop_items(),
+        "player_credits" :  profile.credits,
+        "inventory" : get_inventory_items(profile)
+    }
+    return render(request, "WebApp/shop.html", context)
+
+
 @login_required
 def game(request):
     username=request.user.username
@@ -312,9 +433,24 @@ def search(request):
     }
     return render(request, "WebApp/search.html", context)
 
+<<<<<<< HEAD
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        print(form.error_messages)
+        if form.is_valid() or _IGNORE_PASSWORD_REQS:
+            user = form.save()
+            login(request, user)
+            return redirect('home')  # Redirect to home page
+
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'WebApp/register.html', {'form': form})
+=======
 # ------------------------------------------------------
 # Leaderboard view:
 # ------------------------------------------------------
+>>>>>>> origin
 
 def leaderboard(request):
     # Get all leaderboard visual data:
@@ -355,11 +491,17 @@ def profile(request, username=None):
     print(friend_request_list)
     print(friend_list)
 
+
+    
+    user_profile.render_bean_with_accessories().save(buffer := BytesIO(), "png")
+    bean_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
     context = {
         'profile': user_profile,
         'req_list' : friend_request_list,
         'friend_list' : friend_list,
         'mission_photos': mission_photos,
+        "bean_str" : bean_str
     };
 
     return render(request, 'WebApp/profile.html', context)

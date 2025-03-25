@@ -1,9 +1,12 @@
+from os import name
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import models
 from django.utils.timezone import now, localtime
 from datetime import timedelta
+from PIL import Image
+from django.contrib.staticfiles import finders
 
 # TODO make seperate section for daily / other missions in missions.html
 
@@ -55,10 +58,27 @@ class User(AbstractUser):
         self.login_streak = 0
         #print(f"New score: {profile.score}, streak reset to {self.login_streak}")
         return
+
+    def _get_GDPR_data(user):
+
+        userData = ''
+
+        for key in (fields := {
+            "username" : user.username, 
+            "first name" : user.first_name, 
+            "last name" : user.last_name,
+            "email" : user.email,
+            "date joined" : user.date_joined,
+            "last login date" : user.last_login_date, 
+            "login streak" : user.login_streak,
+            "user type" : user.user_type
+        }):
+            userData += (f'{key} = {fields[key]}\n')
+        
+        return userData
     
-# ------------------------------------------------------
-# TEAM CLASS - HANDLES USER TEAMS
-# ------------------------------------------------------
+
+# Code for teams (user guilds/clans):
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     team_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="led_teams")
@@ -89,7 +109,19 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+
+# ------------------------------------------------------
+# SHOP CLASS - HANDLES ALL NAMES AND COSTS OF COSMETICS
+# ------------------------------------------------------
+class ShopItem(models.Model):
+    pass;
+
+    name = models.CharField(max_length = 100, unique = True)
+    cost = models.IntegerField(default=1)
     
+    def __str__(self) -> str:
+        return f"(cosmetic) {self.name} ({self.cost} credits)"
+
 # ------------------------------------------------------
 # PROFILE CLASS - HANDLES USER PROFILES & RELATED DATA
 # ------------------------------------------------------
@@ -99,13 +131,81 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
+    inventory = models.ManyToManyField(ShopItem, related_name="inv")
+    # equipped = models.ManyToManyField(ShopItem, related_name="eqi")
+
     friend_requests = models.ManyToManyField(User, related_name = "friend_requests")
     friend_list = models.ManyToManyField(User, related_name = "friend_list")
 
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name="profiles")
 
+    credits = models.IntegerField(default=10)
+
+    def render_bean_with_accessories(self):
+        path = finders.find("gbc3.png")
+        staticPath = path[:len(path) - 8]
+        base = Image.open(path)
+
+        baseSize = base.size
+
+        shoeN = 0; hatN = 0
+        
+        for accessoryObject in self.inventory.all():
+            accessoryImg = Image.open(staticPath + r"cosmetics/" + (accessoryObject.name + ".png"))
+            offset = (0, 0)
+
+            if ("Shoe" in accessoryObject.name or "Cap" in accessoryObject.name):
+                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+                offset = (
+                    int(baseSize[0] / 2) - 200 + shoeN * 50,
+                    int(baseSize[1] / 2) + 100 + shoeN * 50
+                )
+                shoeN += 1
+
+            if ("Hat" in accessoryObject.name):
+                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+                offset = (
+                    200 + hatN * 50,
+                    -100 + hatN * 50
+                )
+                hatN += 1
+
+            base.paste(accessoryImg, offset, accessoryImg)
+        return base
+
     def __str__(self):
         return f'{self.user.username} Profile'
+
+    def get_pfp(self):
+        return Image.open(self.profile_picture.path)            \
+               if self.profile_picture is not None else None
+
+    def get_GDPR_data(profile):
+
+        profileData = ''
+
+        for key in (fields := {
+            "score" : profile.score,
+            "bio" : profile.bio,
+            "profile picture" : profile.profile_picture, 
+            "credit count" : profile.credits,
+            # "cosmetic inventory" : 
+            #     ', '.join([str(item) for item in profile.inventory.all()]),
+            "equipped cosmetics" : 
+                ', '.join([str(item) for item in profile.equipped.all()]),
+            "friend list" :
+                ', '.join([str(item) for item in profile.friend_list.all()]),
+            "friend request list" :
+                ', '.join([str(item) for item in profile.friend_requests.all()]),
+            "team" : profile.team
+        }):
+            profileData += (f'{key} = {fields[key]}\n')
+
+        userData = profile.user._get_GDPR_data()
+        
+        return f'PROFILE DATA = \n{profileData}\nUSER DATA = \n{userData}';
+
+        
     
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

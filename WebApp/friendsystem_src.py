@@ -1,4 +1,3 @@
-from codecs import getdecoder
 from .models import *
 
 class DistilledProfileData:

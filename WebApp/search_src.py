@@ -2,14 +2,14 @@ from .models import User, Profile
 
 # Function to return true if database_username is to be returned
 # from search bar when input_username is searched for:
-def _match(input_username, database_username):
+def DEPRICATED__match(input_username, database_username):
     return                                      \
         input_username in database_username     \
         or                                      \
         database_username in input_username
 
 
-def get_profile_picture_path_SQL(username):
+def DEPRICATED_get_profile_picture_path_SQL(username):
     return                                    \
         "SELECT profile_picture "            + \
         "FROM WebApp_user,"         + \
