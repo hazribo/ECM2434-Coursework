@@ -32,8 +32,6 @@ class ShopItemData:
     buyurl = None
 
 
-def generate_bean_with_cosmetics(userid):
-    pass;
 
 
 

@@ -183,8 +183,7 @@ class Profile(models.Model):
         return f'{self.user.username} Profile'
 
     def get_pfp(self):
-        return Image.open(self.profile_picture.path)            \
-               if self.profile_picture is not None else None
+        return None if self.profile_picture is not None else Image.open(self.profile_picture.path)
 
     def get_GDPR_data(profile):
 
@@ -193,12 +192,12 @@ class Profile(models.Model):
         for key in (fields := {
             "score" : profile.score,
             "bio" : profile.bio,
-            "profile picture" : profile.profile_picture, 
+            # "profile picture" : profile.profile_picture, 
             "credit count" : profile.credits,
-            # "cosmetic inventory" : 
-            #     ', '.join([str(item) for item in profile.inventory.all()]),
-            "equipped cosmetics" : 
-                ', '.join([str(item) for item in profile.equipped.all()]),
+            "cosmetic inventory" : 
+                ', '.join([str(item) for item in profile.inventory.all()]),
+            # "equipped cosmetics" : 
+            #     ', '.join([str(item) for item in profile.equipped.all()]),
             "friend list" :
                 ', '.join([str(item) for item in profile.friend_list.all()]),
             "friend request list" :
@@ -208,6 +207,12 @@ class Profile(models.Model):
             profileData += (f'{key} = {fields[key]}\n')
 
         userData = profile.user._get_GDPR_data()
+
+        if profile.profile_picture:
+            img = Image.open(profile.profile_picture.path)
+            userData += f'\n profile picture data = \n {str([_ for _ in img.getdata()])}'
+            # img.show()
+            # print(profile.profile_picture.tell())
         
         return f'PROFILE DATA = \n{profileData}\nUSER DATA = \n{userData}';
 

@@ -265,13 +265,9 @@ def datareq(request, username):
     _, profile = _get_user_data(request)
     
     userData = profile.get_GDPR_data()
-    pfpData = profile.get_pfp()
-
-    pfpData = "\n" + str(pfpData if pfpData is None else 
-                         [item for item in pfpData.getdata()]) 
 
     # proper way, force file download
-    response = HttpResponse(userData + str(pfpData), content_type="application/text charset=utf-8");
+    response = HttpResponse(userData, content_type="application/text charset=utf-8");
     response["Content-Disposition"] = f"attatchment; filename={_GDPR_RETURN_FILE_NAME}.txt"
 
     return response
