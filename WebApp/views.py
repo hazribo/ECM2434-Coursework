@@ -1,3 +1,4 @@
+
 import django
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
@@ -29,6 +30,7 @@ from os import remove
 # ------------------------------------------------------
 # Helper Functions for Permissions:
 # ------------------------------------------------------
+
 def is_game_keeper_or_developer(user):
     return user.user_type in ['game_keeper', 'developer']
 def is_developer(user):
@@ -294,13 +296,9 @@ def datareq(request, username):
     _, profile = _get_user_data(request)
     
     userData = profile.get_GDPR_data()
-    pfpData = profile.get_pfp()
-
-    pfpData = "\n" + str(pfpData if pfpData is None else 
-                         [item for item in pfpData.getdata()]) 
 
     # proper way, force file download
-    response = HttpResponse(userData + str(pfpData), content_type="application/text charset=utf-8");
+    response = HttpResponse(userData, content_type="application/text charset=utf-8");
     response["Content-Disposition"] = f"attatchment; filename={_GDPR_RETURN_FILE_NAME}.txt"
 
     return response
@@ -416,10 +414,43 @@ def profile(request, username=None):
     print(friend_request_list)
     print(friend_list)
 
+    base = None
 
+    pathTemp = finders.find("gbc3.png")
+    staticPath = pathTemp[:len(pathTemp) - 8]
+
+    score = user_profile.score
+
+    if score > 50:
+        path = "gbc3.png"
+
+    elif score > 40:
+        path = "BPsix.png"
+
+    elif score > 30:
+        path = "BPfive.png"
+
+    elif score > 20:
+        path = "BPfour.png"
+
+    elif score > 10:
+        path = "BPthree.png"
+
+    elif score > 5:
+        path = "BPtwo.png"
+
+    else:
+        path = "BPone.png"
+
+    # if (user_profile.score )
+    # print(user_profile.score)
+
+    base = Image.open(staticPath + path)
     
-    user_profile.render_bean_with_accessories().save(buffer := BytesIO(), "png")
-    bean_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    user_profile.render_bean_with_accessories(base) \
+        .save(buffer := BytesIO(), "png")
+    bean_str = base64.b64encode(buffer.getvalue())  \
+        .decode('utf-8')
 
     context = {
         'profile': user_profile,

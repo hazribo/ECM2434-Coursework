@@ -141,10 +141,10 @@ class Profile(models.Model):
 
     credits = models.IntegerField(default=10)
 
-    def render_bean_with_accessories(self):
+    def render_bean_with_accessories(self, base):
         path = finders.find("gbc3.png")
         staticPath = path[:len(path) - 8]
-        base = Image.open(path)
+        # base = Image.open(path)
 
         baseSize = base.size
 
@@ -155,30 +155,32 @@ class Profile(models.Model):
             offset = (0, 0)
 
             if ("Shoe" in accessoryObject.name or "Cap" in accessoryObject.name):
-                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+                accessoryImg = accessoryImg.resize((128, 128), Image.Resampling.LANCZOS)
                 offset = (
-                    int(baseSize[0] / 2) - 200 + shoeN * 50,
-                    int(baseSize[1] / 2) + 100 + shoeN * 50
+                    int(baseSize[0] / 2) - 20 + shoeN * 5,
+                    int(baseSize[1] / 2) + 30 + shoeN * 5
                 )
                 shoeN += 1
 
-            if ("Hat" in accessoryObject.name):
-                accessoryImg = accessoryImg.resize((512, 512), Image.Resampling.LANCZOS)
+            if ("Hat" in accessoryObject.name or "Cap" in accessoryObject.name):
+                accessoryImg = accessoryImg.resize((128, 128), Image.Resampling.LANCZOS)
                 offset = (
-                    200 + hatN * 50,
-                    -100 + hatN * 50
+                    100 + hatN * 5,
+                    -60 + hatN * 5
                 )
                 hatN += 1
 
             base.paste(accessoryImg, offset, accessoryImg)
+        
+        # base.show()
+            
         return base
 
     def __str__(self):
         return f'{self.user.username} Profile'
 
     def get_pfp(self):
-        return Image.open(self.profile_picture.path)            \
-               if self.profile_picture is not None else None
+        return None if self.profile_picture is not None else Image.open(self.profile_picture.path)
 
     def get_GDPR_data(profile):
 
@@ -187,12 +189,12 @@ class Profile(models.Model):
         for key in (fields := {
             "score" : profile.score,
             "bio" : profile.bio,
-            "profile picture" : profile.profile_picture, 
+            # "profile picture" : profile.profile_picture, 
             "credit count" : profile.credits,
-            # "cosmetic inventory" : 
-            #     ', '.join([str(item) for item in profile.inventory.all()]),
-            "equipped cosmetics" : 
-                ', '.join([str(item) for item in profile.equipped.all()]),
+            "cosmetic inventory" : 
+                ', '.join([str(item) for item in profile.inventory.all()]),
+            # "equipped cosmetics" : 
+            #     ', '.join([str(item) for item in profile.equipped.all()]),
             "friend list" :
                 ', '.join([str(item) for item in profile.friend_list.all()]),
             "friend request list" :
@@ -202,6 +204,12 @@ class Profile(models.Model):
             profileData += (f'{key} = {fields[key]}\n')
 
         userData = profile.user._get_GDPR_data()
+
+        if profile.profile_picture:
+            img = Image.open(profile.profile_picture.path)
+            userData += f'\n profile picture data = \n {str([_ for _ in img.getdata()])}'
+            # img.show()
+            # print(profile.profile_picture.tell())
         
         return f'PROFILE DATA = \n{profileData}\nUSER DATA = \n{userData}';
 
