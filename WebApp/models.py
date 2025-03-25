@@ -195,8 +195,8 @@ class Profile(models.Model):
             "bio" : profile.bio,
             "profile picture" : profile.profile_picture, 
             "credit count" : profile.credits,
-            "cosmetic inventory" : 
-                ', '.join([str(item) for item in profile.inventory.all()]),
+            # "cosmetic inventory" : 
+            #     ', '.join([str(item) for item in profile.inventory.all()]),
             "equipped cosmetics" : 
                 ', '.join([str(item) for item in profile.equipped.all()]),
             "friend list" :

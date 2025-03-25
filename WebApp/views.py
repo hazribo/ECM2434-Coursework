@@ -180,8 +180,11 @@ def missions(request):
                 profile = request.user.profile
                 if user_mission.completed:
                     profile.score += mission.points
+                    profile.credits += 1
                 else:
                     profile.score -= mission.points
+                    profile.credits -= 1
+                
                 profile.save()
 
                 return JsonResponse({
