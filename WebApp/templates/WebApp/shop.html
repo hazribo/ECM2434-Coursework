@@ -1,0 +1,125 @@
+﻿{% extends 'WebApp/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+{% block content %}
+
+
+
+<div class="container d-flex justify-content-center align-items-center left-align" style="min-height: 80vh;">
+
+
+    <!-- credits -->
+    <div class="card shadow-lg p-5 sideways-inline section" style="width: 250px; margin-right: 50px; float: right;">
+        <div class="align-items-center sideways-inline">
+            <h2 class="text-center text-success mb-4">Credits</h2>
+            <h3 class="text-center" style="color:darkgoldenrod;">{{player_credits}}</h3>
+        </div>
+    </div>
+
+
+    <!-- list of items -->
+    <div class="card shadow-lg p-5 sideways-inline section">
+        <h2 class="text-center text-success mb-4">Shop</h2>
+
+        {% for item in shop_items %}
+
+        <div class="item-shop-element" background-color: #3bbd60;>
+
+            <h3 class="text-success">{{item.name}}</h3>
+            <h5 style="color:darkgoldenrod;">{{item.cost}} credits</h5>
+            <img src={% static item.thpath%}    
+                 style="width:100px;height:100px;" />
+
+            <form action={{item.buyurl}}>
+                {% csrf_token %}
+                <button class="buybutton">buy</button>
+            </form>
+
+        </div>
+
+
+
+        {% endfor %}
+
+
+    </div>
+
+    <!-- items already purchased -->
+
+    <div class="card shadow-lg p-5 sideways-inline section" style="width: 250px; margin-left: 50px;">
+        <div class="align-items-center sideways-inline">
+            <h3 class="text-success">Inventory</h3>
+
+            {% for item in inventory %}
+
+            <div class="item-shop-element" background-color: #3bbd60;>
+
+                <h3 class="text-success">{{item.name}}</h3>
+                <img src={% static item.thpath%}
+                     style="width:100px;height:100px;" />
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+
+</div>
+
+    <style>
+        .buybutton {
+            background-color: #44c767;
+            border-radius: 27px;
+            border: 4px solid #18ab29;
+            display: inline-block;
+            cursor: pointer;
+            color: #000000;
+            font-family: Arial;
+            font-size: 16px;
+            padding: 10px 10px;
+            text-decoration: none;
+            text-shadow: 0px 3px 5px #2f6627;
+        }
+
+            .buybutton:hover {
+                background-color: #329d51;
+            }
+
+            .buybutton:active {
+                background-color: #4cea7a;
+            }
+
+
+
+        .sideways-inline {
+            display: inline-block;
+        }
+
+        .item-shop-element {
+            border: 6px solid #3bbd60;
+            border-radius: 18px;
+            opacity: 0.75;
+            margin-bottom: 20px;
+        }
+
+            .item-shop-element:hover {
+                opacity: 1.0;
+            }
+
+        .section {
+            border-radius: 20px;
+            background-color: #e6f4ea;
+            max-width: 400px;
+            width: 100%;
+        }
+    </style>
+
+
+
+
+    {% endblock %}
+</html>

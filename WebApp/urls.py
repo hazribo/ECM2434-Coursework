@@ -13,6 +13,7 @@ urlpatterns = [
     path('about', about, name='about'),
     path('game', game, name='game'),
     path("leaderboard/", leaderboard, name='leaderboard'),
+    path("policy/", policy, name='policy'),
     # Profile:
     path('profile/', redirect_to_profile, name='redirect_to_profile'),
     path('profile/<str:username>/', profile, name='profile'),
@@ -26,8 +27,9 @@ urlpatterns = [
     path('missions/', missions, name='missions'),
     path('manage_missions/', manage_missions, name='manage_missions'),
     path('save_photo', save_photo, name='save_photo'),
-    # Teams:
-    path("teams/", manage_teams, name="teams"),
+    # Shop urls:
+    path("shop", shop, name="shop"),
+    path("shop/<str:itemname>/", buy_shop, name="buy")
 ]
 
 if settings.DEBUG:
