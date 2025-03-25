@@ -66,33 +66,13 @@
         <h3>Your Pet!</h3>
         <img src="{% static 'gbc3.png' %}" alt="Bean" width="250" class="border rounded">
     </div>
-
-    {% endfor %}
-
-
 </div>
 
 
 <div class="col mt-2"><div class="character-box rounded-box">
     <h1 style="text-align: center;">Your Pet!</h1>
     <div style="text-align: center;">
-<<<<<<< HEAD
         <img src="data:image/png;base64,{{bean_str}}" alt="Bean" width="250" height="250" />
-=======
-        {% if profile.score > 40 %}
-        <img src="{% static 'BPsix.png' %}" alt="Bean" width="250" height="250" />
-        {% elif profile.score == 40 %}
-        <img src="{% static 'BPfive.png' %}" alt="Bean" width="250" height="250" />
-        {% elif profile.score == 30 %}
-        <img src="{% static 'BPfour.png' %}" alt="Bean" width="250" height="250" />
-        {% elif profile.score == 20 %}
-        <img src="{% static 'BPthree.png' %}" alt="Bean" width="250" height="250" />
-        {% elif profile.score == 10 %}
-        <img src="{% static 'BPtwo.png' %}" alt="Bean" width="250" height="250" />
-        {% else %}
-        <img src="{% static 'BPone.png' %}" alt="Bean" width="250" height="250" />
-        {% endif %}
->>>>>>> origin
     </div>
         {% if profile.score > 40 %}
         <p style="text-align: center;">Bean Happiness: 6/6 </p>
@@ -123,20 +103,16 @@
         <div class="image-box">
             <img src="{{ image.image.url }}" alt="User Image">
         </div>
+        {% endfor %}
     </div>
 </div>
 
-<<<<<<< HEAD
 <form action="datareq">
-
     <a href="userdata.txt" download>
         <button>request all user data</button>
 </form>
 
 
-=======
-<!-- JavaScript for Buttons -->
->>>>>>> origin
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".friend-reject-button").forEach(button => {
@@ -283,9 +259,6 @@
         margin-top: 20px;
         text-align: center;
     }
-<<<<<<< HEAD
-
-=======
     .rounded-box {
         border-radius: 5px;
         box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
@@ -300,7 +273,6 @@
         max-width: 400px;
         background-color: #548eb3;
     }
->>>>>>> origin
     .image-gallery-container {
         margin-top: 20px;
         text-align: center;
