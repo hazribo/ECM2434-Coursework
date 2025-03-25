@@ -14,6 +14,7 @@ urlpatterns = [
     path('game', game, name='game'),
     path("leaderboard/", leaderboard, name='leaderboard'),
     path("policy/", policy, name='policy'),
+    path("teams/", manage_teams, name="teams"),
     # Profile:
     path('profile/', redirect_to_profile, name='redirect_to_profile'),
     path('profile/<str:username>/', profile, name='profile'),
