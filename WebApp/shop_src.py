@@ -18,8 +18,6 @@ SHOP_ITEMS = [
     {"name" : "PirateHat",      "cost" : 2, "thPath" : "cosmetics/PirateHat.png" },
     {"name" : "RedTopHat",      "cost" : 2, "thPath" : "cosmetics/RedTopHat.png" },
     {"name" : "CowboyHat",      "cost" : 2, "thPath" : "cosmetics/CowboyHat.png" },
-
-    {"name" : "BPsix",          "cost" : 10, "thPath" : "cosmetics/BPsix.png" },
    
 ]
 
