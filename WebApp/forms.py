@@ -33,7 +33,10 @@ class UserRegistrationForm(UserCreationForm):
         self.fields['username'].help_text = ''
         self.fields['email'].help_text = ''
         self.fields['password2'].help_text = ''
-        self.fields['user_type'].help_text = 'DEV SETTING - REMOVE FROM OFFICIAL RELEASE.'
+        self.fields['user_type'].help_text = ''
+
+        # print(dir(self.fields["user_type"]))
+        self.fields["user_type"].disabled = True
 
 # ------------------------------------------------------
 # Profile Update - for changing bio, profile pic
